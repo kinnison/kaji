@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! Kaji is a puzzle solver
+//!
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod constraints;
+pub(crate) mod puzzle;
+pub(crate) mod symbols;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use puzzle::Puzzle;
