@@ -1,0 +1,4 @@
+[workspace]
+members = [ "kaji", "kaji-bin" ]
+resolver = "2"
+default-members = [ "kaji-bin"]
