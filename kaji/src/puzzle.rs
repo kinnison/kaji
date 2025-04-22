@@ -1,13 +1,13 @@
 use crate::constraints::*;
+use crate::consts::SYMBOL_SET_DIGITS;
 use crate::symbols::*;
 
 use std::collections::HashMap;
 use std::fmt::Display;
-use std::usize;
 
 #[derive(Debug)]
 pub struct Puzzle {
-    symbols: Vec<SymbolSet>,
+    symbols: Vec<RawSymbolSet>,
     constraints: Vec<Box<dyn Constraint>>,
     cells: Vec<CellInfo>,
     regions: Vec<Region>,
@@ -36,6 +36,21 @@ pub struct CellIndex(usize);
 #[repr(transparent)]
 pub struct RegionIndex(usize);
 
+#[derive(Debug, Clone, Copy)]
+#[repr(transparent)]
+pub struct SymbolSetIndex(usize);
+
+/// A representation of an in-progress solve.
+pub struct SolveState<'p> {
+    puzzle: &'p Puzzle,
+    board: Board,
+}
+
+pub struct SymbolChoice {
+    set: SymbolSetIndex,
+    choice: RawSymbolChoice,
+}
+
 /// A board is the cell state of the grid during a puzzle solve
 ///
 /// For example, it will contain the found digits and the results of
@@ -46,13 +61,13 @@ pub struct RegionIndex(usize);
 pub struct Board {
     ncells: usize,
     nsymbols: usize,
-    cells: Vec<SymbolChoice>,
+    cells: Vec<RawSymbolChoice>,
 }
 
 impl Puzzle {
     pub fn new_sudoku(size: usize) -> Puzzle {
         assert_eq!(size, 6);
-        let mut digits = SymbolSet::new("digits");
+        let mut digits = RawSymbolSet::new(SYMBOL_SET_DIGITS);
         digits.push("1");
         digits.push("2");
         digits.push("3");
@@ -151,12 +166,12 @@ impl Puzzle {
             .push((cell0, has));
     }
 
-    pub fn initial_board(&self) -> Board {
-        let mut board = Board::empty(self.cells.len(), &self.symbols);
+    pub fn initial_board(&self) -> SolveState {
+        let mut state = SolveState::new(self, Board::empty(self.cells.len(), &self.symbols));
         for constraint in &self.constraints {
-            constraint.prep_board(self, &mut board);
+            constraint.prep_board(&mut state);
         }
-        board
+        state
     }
 
     pub fn print_board(&self, board: &Board) {
@@ -197,15 +212,29 @@ impl Puzzle {
         self.constraints.push(Box::new(constraint));
     }
 
-    pub fn symbol_set(&self, idx: usize) -> &SymbolSet {
-        &self.symbols[idx]
+    pub fn symbol_set(&self, idx: SymbolSetIndex) -> &RawSymbolSet {
+        &self.symbols[idx.0]
     }
 
     pub fn cell_at(&self, row: usize, col: usize) -> Option<CellIndex> {
         self.rowcols.get(&(row, col)).copied()
     }
 
-    pub fn symbols(&self, set: usize) -> impl Iterator<Item = SymbolId> {
+    pub fn symbols(&self, set: SymbolSetIndex) -> impl Iterator<Item = SymbolId> {
+        self.symbols[set.0].to_ids(set.0)
+    }
+
+    fn symbol_set_idx_by_name(&self, set: &str) -> usize {
+        for (idx, rawset) in self.symbols.iter().enumerate() {
+            if rawset.name() == set {
+                return idx;
+            }
+        }
+        panic!("Unable to find {set}");
+    }
+
+    pub fn symbols_by_set_name(&self, set: &str) -> impl Iterator<Item = SymbolId> {
+        let set = self.symbol_set_idx_by_name(set);
         self.symbols[set].to_ids(set)
     }
 
@@ -236,18 +265,18 @@ impl Puzzle {
         (0..self.cells.len()).map(CellIndex)
     }
 
-    pub fn symbol_sets(&self) -> impl Iterator<Item = usize> {
-        0..self.symbols.len()
+    pub fn symbol_sets(&self) -> impl Iterator<Item = SymbolSetIndex> {
+        (0..self.symbols.len()).map(SymbolSetIndex)
     }
 
     pub fn cell_info(&self, cell: CellIndex) -> &CellInfo {
         &self.cells[cell.0]
     }
 
-    pub fn logical_step(&self, board: &mut Board) -> LogicalStep {
+    pub fn logical_step(&self, board: &mut SolveState) -> LogicalStep {
         let mut finished = true;
         for constraint in &self.constraints {
-            match constraint.logical_step(self, board) {
+            match constraint.logical_step(board) {
                 LogicalStep::NoAction => {
                     finished = false;
                 }
@@ -279,7 +308,7 @@ impl Puzzle {
                 }
             }
         }
-        board
+        board.into_board()
     }
 }
 
@@ -296,11 +325,11 @@ impl Display for Region {
 }
 
 impl Board {
-    fn empty(ncells: usize, symbols: &[SymbolSet]) -> Self {
+    fn empty(ncells: usize, symbols: &[RawSymbolSet]) -> Self {
         let mut cells = Vec::with_capacity(ncells * symbols.len());
         for _cell in 0..ncells {
             for symbols in symbols {
-                cells.push(SymbolChoice::any(symbols.len()));
+                cells.push(RawSymbolChoice::any(symbols.len()));
             }
         }
         Self {
@@ -314,23 +343,23 @@ impl Board {
         self.cells.iter().all(|c| c.solved())
     }
 
-    pub fn choices(&self, idx: CellIndex) -> impl Iterator<Item = SymbolChoice> + use<'_> {
+    pub fn choices(&self, idx: CellIndex) -> impl Iterator<Item = RawSymbolChoice> + use<'_> {
         let idx = idx.0 * self.nsymbols;
         assert!(idx + self.nsymbols <= self.cells.len());
         self.cells.iter().skip(idx).take(self.nsymbols).copied()
     }
 
-    pub fn choice(&self, idx: CellIndex, symbol: SymbolId) -> SymbolChoice {
+    pub fn choice(&self, idx: CellIndex, symbol: SymbolId) -> RawSymbolChoice {
         let idx = idx.0 * self.nsymbols + symbol.into_parts().0;
         self.cells[idx]
     }
 
-    fn choice_mut(&mut self, idx: CellIndex, symbol: SymbolId) -> &mut SymbolChoice {
+    fn choice_mut(&mut self, idx: CellIndex, symbol: SymbolId) -> &mut RawSymbolChoice {
         let idx = idx.0 * self.nsymbols + symbol.into_parts().0;
         &mut self.cells[idx]
     }
 
-    pub fn choice_set(&self, idx: CellIndex, set: usize) -> SymbolChoice {
+    pub fn choice_set(&self, idx: CellIndex, set: usize) -> RawSymbolChoice {
         let idx = idx.0 * self.nsymbols + set;
         self.cells[idx]
     }
@@ -339,5 +368,94 @@ impl Board {
 impl Display for CellInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.name.fmt(f)
+    }
+}
+
+impl<'p> SolveState<'p> {
+    pub fn new(puzzle: &'p Puzzle, board: Board) -> Self {
+        Self { puzzle, board }
+    }
+
+    pub fn solved(&self) -> bool {
+        self.board.solved()
+    }
+
+    pub fn into_board(self) -> Board {
+        self.board
+    }
+
+    pub fn symbols_by_set_name(&self, set: &str) -> impl Iterator<Item = SymbolId> {
+        self.puzzle.symbols_by_set_name(set)
+    }
+
+    pub fn cell_at(&self, row: usize, col: usize) -> Option<CellIndex> {
+        self.puzzle.cell_at(row, col)
+    }
+
+    pub fn set_symbol(&mut self, cell: CellIndex, digit: SymbolId) {
+        self.puzzle.set_symbol(&mut self.board, cell, digit);
+    }
+
+    pub fn all_cells(&self) -> impl Iterator<Item = CellIndex> {
+        self.puzzle.all_cells()
+    }
+
+    pub fn symbol_sets(&self) -> impl Iterator<Item = SymbolSetIndex> {
+        self.puzzle.symbol_sets()
+    }
+
+    pub fn choices(&self, cell: CellIndex, set: SymbolSetIndex) -> SymbolChoice {
+        let raw_choice = self
+            .board
+            .choices(cell)
+            .nth(set.0)
+            .expect("For some reason, a choice was missing");
+        SymbolChoice::new(set, raw_choice)
+    }
+
+    pub fn cell_info(&self, cell: CellIndex) -> &CellInfo {
+        self.puzzle.cell_info(cell)
+    }
+
+    pub(crate) fn symbol(&self, value: SymbolId) -> &Symbol {
+        let (set, idx) = value.into_parts();
+        &self.puzzle.symbols[set][idx]
+    }
+
+    pub fn regions(&self) -> impl Iterator<Item = RegionIndex> {
+        self.puzzle.regions()
+    }
+
+    pub fn region(&self, region: RegionIndex) -> &Region {
+        self.puzzle.region(region)
+    }
+
+    pub fn symbol_set(&self, set: SymbolSetIndex) -> &RawSymbolSet {
+        self.puzzle.symbol_set(set)
+    }
+
+    pub fn symbols(&self, set: SymbolSetIndex) -> impl Iterator<Item = SymbolId> {
+        self.puzzle.symbol_set(set).to_ids(set.0)
+    }
+}
+
+impl SymbolChoice {
+    pub fn new(set: SymbolSetIndex, choice: RawSymbolChoice) -> Self {
+        Self { set, choice }
+    }
+
+    pub fn solved(&self) -> bool {
+        self.choice.solved()
+    }
+
+    pub fn single_value(&self) -> Option<SymbolId> {
+        self.choice
+            .single_value()
+            .map(|symbol| SymbolId::new(self.set.0, symbol))
+    }
+
+    pub fn options(&self) -> impl Iterator<Item = SymbolId> {
+        let set = self.set.0;
+        self.choice.options().map(move |v| SymbolId::new(set, v))
     }
 }

@@ -1,4 +1,4 @@
-use crate::puzzle::{Board, CellIndex, Puzzle};
+use crate::puzzle::{CellIndex, SolveState};
 
 use super::{Constraint, LogicalStep};
 
@@ -6,16 +6,16 @@ use super::{Constraint, LogicalStep};
 pub struct NakedSingle;
 
 impl Constraint for NakedSingle {
-    fn logical_step(&self, puzzle: &Puzzle, board: &mut Board) -> LogicalStep {
-        for cell in puzzle.all_cells() {
-            for set in puzzle.symbol_sets() {
-                let choice = board.choices(cell).nth(set).unwrap();
+    fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
+        for cell in state.all_cells() {
+            for set in state.symbol_sets() {
+                let choice = state.choices(cell, set);
                 if !choice.solved() {
                     if let Some(value) = choice.single_value() {
                         // We're not solved and there's only one thing we can be
-                        puzzle.set_symbol(board, cell, puzzle.symbol_set(set).id(set, value));
-                        let cell = puzzle.cell_info(cell);
-                        let value = &puzzle.symbol_set(set)[value];
+                        state.set_symbol(cell, value);
+                        let cell = state.cell_info(cell);
+                        let value = state.symbol(value);
                         return LogicalStep::Acted(format!("Naked single {value} at {cell}"));
                     }
                 }
@@ -30,7 +30,7 @@ impl Constraint for NakedSingle {
 pub struct HiddenSingle;
 
 impl Constraint for HiddenSingle {
-    fn logical_step(&self, puzzle: &Puzzle, board: &mut Board) -> LogicalStep {
+    fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
         #[derive(Clone)]
         enum SymbolState {
             Unknown,
@@ -38,18 +38,18 @@ impl Constraint for HiddenSingle {
             Many,
         }
         use SymbolState::*;
-        for region in puzzle.regions() {
-            let cells = puzzle.region(region).to_cells();
-            for set in puzzle.symbol_sets() {
-                let nsymbols = puzzle.symbol_set(set).len();
-                let mut symbols = vec![Unknown; nsymbols];
+        for region in state.regions() {
+            let cells = state.region(region).to_cells();
+            for set in state.symbol_sets() {
+                let symbolids = state.symbols(set).collect::<Vec<_>>();
+                let mut symbols = vec![Unknown; symbolids.len()];
                 'cells: for cell in cells.iter().copied() {
-                    let choice = board.choice_set(cell, set);
+                    let choice = state.choices(cell, set);
                     if choice.solved() {
                         continue 'cells;
                     }
                     for symbolnr in choice.options() {
-                        symbols[symbolnr] = match symbols[symbolnr] {
+                        symbols[symbolnr.symbol_index()] = match symbols[symbolnr.symbol_index()] {
                             Unknown => Single(cell),
                             _ => Many,
                         };
@@ -57,11 +57,11 @@ impl Constraint for HiddenSingle {
                 }
                 for (idx, symbol) in symbols.into_iter().enumerate() {
                     if let Single(cell) = symbol {
-                        let symbol = puzzle.symbol_set(set).id(set, idx);
-                        puzzle.set_symbol(board, cell, symbol);
-                        let value = &puzzle.symbol_set(set)[idx];
-                        let region = puzzle.region(region);
-                        let cell = puzzle.cell_info(cell);
+                        let symbol = symbolids[idx];
+                        state.set_symbol(cell, symbol);
+                        let value = state.symbol(symbol);
+                        let region = state.region(region);
+                        let cell = state.cell_info(cell);
                         return LogicalStep::Acted(format!(
                             "Hidden single {value} at {cell} in {region}"
                         ));

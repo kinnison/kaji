@@ -5,7 +5,7 @@ pub use givendigit::GivenDigits;
 pub use singles::HiddenSingle;
 pub use singles::NakedSingle;
 
-use crate::puzzle::{Board, Puzzle};
+use crate::puzzle::SolveState;
 
 pub trait Constraint: std::fmt::Debug {
     /// Prepare a board ready for "playing".
@@ -17,7 +17,7 @@ pub trait Constraint: std::fmt::Debug {
     /// If the constraint has no preparation to do, this can be
     /// omitted.  However if omitted, the constraint must provide
     /// a logical step
-    fn prep_board(&self, _puzzle: &Puzzle, _board: &mut Board) {}
+    fn prep_board(&self, _state: &mut SolveState) {}
 
     /// Execute a single logical action on the board.
     ///
@@ -29,7 +29,7 @@ pub trait Constraint: std::fmt::Debug {
     /// unable to given the current board state, it should return
     /// `LogicalStep::NoAction`.  If everything the constraint
     /// could do has been done, it should return `LogicalStep::Finished`.
-    fn logical_step(&self, _puzzle: &Puzzle, _board: &mut Board) -> LogicalStep {
+    fn logical_step(&self, _state: &mut SolveState) -> LogicalStep {
         LogicalStep::Finished
     }
 }

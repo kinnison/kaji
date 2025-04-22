@@ -1,7 +1,4 @@
-use std::{
-    fmt::Display,
-    ops::{Deref, Index},
-};
+use std::{fmt::Display, ops::Index};
 
 /// A puzzle cell symbol
 ///
@@ -26,7 +23,7 @@ pub struct Symbol {
 /// represented as a u32, leaving one bit available to say the cell
 /// is solved.
 #[derive(Debug)]
-pub struct SymbolSet {
+pub struct RawSymbolSet {
     name: String,
     symbols: Vec<Symbol>,
 }
@@ -44,7 +41,7 @@ pub struct SymbolId(usize);
 /// a given cell could have in a given board.
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct SymbolChoice(u32);
+pub struct RawSymbolChoice(u32);
 
 impl Symbol {
     pub(crate) fn width(&self) -> usize {
@@ -52,7 +49,7 @@ impl Symbol {
     }
 }
 
-impl SymbolSet {
+impl RawSymbolSet {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
@@ -80,9 +77,13 @@ impl SymbolSet {
     pub fn width(&self) -> usize {
         self.symbols.iter().map(Symbol::width).max().unwrap_or(0)
     }
+
+    pub(crate) fn name(&self) -> &str {
+        &self.name
+    }
 }
 
-impl Index<usize> for SymbolSet {
+impl Index<usize> for RawSymbolSet {
     type Output = Symbol;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -117,16 +118,20 @@ impl From<&str> for Symbol {
 }
 
 impl SymbolId {
-    fn new(set: usize, symbol: usize) -> Self {
+    pub(crate) fn new(set: usize, symbol: usize) -> Self {
         Self((set << 5) | (symbol & 31))
     }
 
     pub(crate) fn into_parts(self) -> (usize, usize) {
         (self.0 >> 5, self.0 & 31)
     }
+
+    pub fn symbol_index(&self) -> usize {
+        self.0 & 31
+    }
 }
 
-impl SymbolChoice {
+impl RawSymbolChoice {
     const VALUE_MASK: u32 = (1 << 31) - 1;
     const SOLVED_MASK: u32 = (1 << 31);
 

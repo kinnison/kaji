@@ -1,4 +1,4 @@
-use crate::puzzle::{Board, Puzzle};
+use crate::{consts::SYMBOL_SET_DIGITS, puzzle::SolveState};
 
 use super::Constraint;
 
@@ -16,13 +16,15 @@ impl GivenDigits {
 }
 
 impl Constraint for GivenDigits {
-    fn prep_board(&self, puzzle: &Puzzle, board: &mut Board) {
-        let digits = puzzle.symbols(0).collect::<Vec<_>>();
+    fn prep_board(&self, state: &mut SolveState) {
+        let digits = state
+            .symbols_by_set_name(SYMBOL_SET_DIGITS)
+            .collect::<Vec<_>>();
         for &(row, col, digit) in &self.digits {
-            if let Some(cell) = puzzle.cell_at(row, col) {
+            if let Some(cell) = state.cell_at(row, col) {
                 assert!(digit > 0);
                 assert!(digit <= digits.len());
-                puzzle.set_symbol(board, cell, digits[digit - 1]);
+                state.set_symbol(cell, digits[digit - 1]);
             }
         }
     }

@@ -2,6 +2,7 @@
 //!
 
 pub mod constraints;
+pub mod consts;
 pub(crate) mod puzzle;
 pub(crate) mod symbols;
 
