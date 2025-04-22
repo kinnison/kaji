@@ -1,4 +1,4 @@
-use crate::constraints::*;
+use crate::constraints::{Constraint, LogicalStep};
 use crate::consts::SYMBOL_SET_DIGITS;
 use crate::symbols::*;
 
@@ -417,7 +417,7 @@ impl<'p> SolveState<'p> {
         self.puzzle.cell_info(cell)
     }
 
-    pub(crate) fn symbol(&self, value: SymbolId) -> &Symbol {
+    pub fn symbol(&self, value: SymbolId) -> &Symbol {
         let (set, idx) = value.into_parts();
         &self.puzzle.symbols[set][idx]
     }

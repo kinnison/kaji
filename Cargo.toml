@@ -1,4 +1,4 @@
 [workspace]
-members = [ "kaji", "kaji-bin" ]
+members = [ "kaji", "kaji-bin" , "kaji-rules"]
 resolver = "2"
 default-members = [ "kaji-bin"]

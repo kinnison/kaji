@@ -3,7 +3,7 @@ use kaji::Puzzle;
 fn main() {
     let mut puzzle = Puzzle::new_sudoku(6);
 
-    let digits = kaji::constraints::GivenDigits::new(&[
+    let digits = kaji_rules::constraints::GivenDigits::new(&[
         (1, 2, 5),
         (1, 6, 2),
         (2, 5, 4),
@@ -17,8 +17,8 @@ fn main() {
     ]);
 
     puzzle.add_constraint(digits);
-    puzzle.add_constraint(kaji::constraints::NakedSingle);
-    puzzle.add_constraint(kaji::constraints::HiddenSingle);
+    puzzle.add_constraint(kaji_rules::constraints::NakedSingle);
+    puzzle.add_constraint(kaji_rules::constraints::HiddenSingle);
 
     let board = puzzle.solve();
     puzzle.print_board(&board);

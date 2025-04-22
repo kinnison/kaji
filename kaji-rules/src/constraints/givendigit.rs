@@ -1,6 +1,4 @@
-use crate::{consts::SYMBOL_SET_DIGITS, puzzle::SolveState};
-
-use super::Constraint;
+use kaji::{consts::SYMBOL_SET_DIGITS, Constraint, SolveState};
 
 #[derive(Debug)]
 pub struct GivenDigits {

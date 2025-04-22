@@ -1,10 +1,3 @@
-mod givendigit;
-mod singles;
-
-pub use givendigit::GivenDigits;
-pub use singles::HiddenSingle;
-pub use singles::NakedSingle;
-
 use crate::puzzle::SolveState;
 
 pub trait Constraint: std::fmt::Debug {

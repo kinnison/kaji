@@ -1,8 +1,7 @@
 [package]
-name = "kaji-bin"
+name = "kaji-rules"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 kaji = { path = "../kaji" }
-kaji-rules = { path = "../kaji-rules" }

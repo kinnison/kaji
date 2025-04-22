@@ -1,6 +1,4 @@
-use crate::puzzle::{CellIndex, SolveState};
-
-use super::{Constraint, LogicalStep};
+use kaji::{CellIndex, Constraint, LogicalStep, SolveState};
 
 #[derive(Debug)]
 pub struct NakedSingle;
