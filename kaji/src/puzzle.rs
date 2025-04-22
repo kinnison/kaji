@@ -59,7 +59,6 @@ pub struct SymbolChoice {
 /// symbol set the cell could have.
 #[derive(Debug)]
 pub struct Board {
-    ncells: usize,
     nsymbols: usize,
     cells: Vec<RawSymbolChoice>,
 }
@@ -333,7 +332,6 @@ impl Board {
             }
         }
         Self {
-            ncells,
             nsymbols: symbols.len(),
             cells,
         }
