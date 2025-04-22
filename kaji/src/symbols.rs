@@ -3,7 +3,8 @@ use std::{fmt::Display, ops::Index};
 /// A puzzle cell symbol
 ///
 /// Cells can ultimately have only one symbol present in them
-/// per [`SymbolSet`] associated with the [`Puzzle`]
+/// per [`SymbolSet`][crate::SymbolSetIndex] associated with
+/// the [`Puzzle`][crate::Puzzle]
 #[derive(Debug)]
 pub struct Symbol {
     name: String,
@@ -23,7 +24,7 @@ pub struct Symbol {
 /// represented as a u32, leaving one bit available to say the cell
 /// is solved.
 #[derive(Debug)]
-pub struct RawSymbolSet {
+pub(crate) struct RawSymbolSet {
     name: String,
     symbols: Vec<Symbol>,
 }
@@ -41,7 +42,7 @@ pub struct SymbolId(usize);
 /// a given cell could have in a given board.
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct RawSymbolChoice(u32);
+pub(crate) struct RawSymbolChoice(u32);
 
 impl Symbol {
     pub(crate) fn width(&self) -> usize {
@@ -172,7 +173,7 @@ impl RawSymbolChoice {
     }
 }
 
-pub struct OptionIter {
+pub(crate) struct OptionIter {
     mask: u32,
 }
 

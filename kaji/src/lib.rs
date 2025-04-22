@@ -6,8 +6,7 @@ pub mod consts;
 pub(crate) mod puzzle;
 pub(crate) mod symbols;
 
-pub use constraints::Constraint;
-pub use constraints::LogicalStep;
-pub use puzzle::CellIndex;
-pub use puzzle::Puzzle;
-pub use puzzle::SolveState;
+// Everything most users of the crate need
+pub use constraints::*;
+pub use puzzle::*;
+pub use symbols::*;
