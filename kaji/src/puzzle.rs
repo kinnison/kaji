@@ -34,11 +34,11 @@ pub struct CellIndex(usize);
 
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
-pub struct RegionIndex(usize);
+pub struct RegionId(usize);
 
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
-pub struct SymbolSetIndex(usize);
+pub struct SymbolSetId(usize);
 
 /// A representation of an in-progress solve.
 pub struct SolveState<'p> {
@@ -47,7 +47,7 @@ pub struct SolveState<'p> {
 }
 
 pub struct SymbolChoice {
-    set: SymbolSetIndex,
+    set: SymbolSetId,
     choice: RawSymbolChoice,
 }
 
@@ -138,11 +138,11 @@ impl Puzzle {
         ret
     }
 
-    pub fn regions(&self) -> impl Iterator<Item = RegionIndex> {
-        (0..self.regions.len()).map(RegionIndex)
+    pub fn regions(&self) -> impl Iterator<Item = RegionId> {
+        (0..self.regions.len()).map(RegionId)
     }
 
-    pub fn region(&self, region: RegionIndex) -> &Region {
+    pub fn region(&self, region: RegionId) -> &Region {
         &self.regions[region.0]
     }
 
@@ -211,7 +211,7 @@ impl Puzzle {
         self.constraints.push(Box::new(constraint));
     }
 
-    fn symbol_set(&self, idx: SymbolSetIndex) -> &RawSymbolSet {
+    fn symbol_set(&self, idx: SymbolSetId) -> &RawSymbolSet {
         &self.symbols[idx.0]
     }
 
@@ -219,7 +219,7 @@ impl Puzzle {
         self.rowcols.get(&(row, col)).copied()
     }
 
-    pub fn symbols(&self, set: SymbolSetIndex) -> impl Iterator<Item = SymbolId> {
+    pub fn symbols(&self, set: SymbolSetId) -> impl Iterator<Item = SymbolId> {
         self.symbols[set.0].to_ids(set.0)
     }
 
@@ -264,8 +264,8 @@ impl Puzzle {
         (0..self.cells.len()).map(CellIndex)
     }
 
-    pub fn symbol_sets(&self) -> impl Iterator<Item = SymbolSetIndex> {
-        (0..self.symbols.len()).map(SymbolSetIndex)
+    pub fn symbol_sets(&self) -> impl Iterator<Item = SymbolSetId> {
+        (0..self.symbols.len()).map(SymbolSetId)
     }
 
     pub fn cell_info(&self, cell: CellIndex) -> &CellInfo {
@@ -393,11 +393,11 @@ impl<'p> SolveState<'p> {
         self.puzzle.all_cells()
     }
 
-    pub fn symbol_sets(&self) -> impl Iterator<Item = SymbolSetIndex> {
+    pub fn symbol_sets(&self) -> impl Iterator<Item = SymbolSetId> {
         self.puzzle.symbol_sets()
     }
 
-    pub fn choices(&self, cell: CellIndex, set: SymbolSetIndex) -> SymbolChoice {
+    pub fn choices(&self, cell: CellIndex, set: SymbolSetId) -> SymbolChoice {
         let raw_choice = self
             .board
             .choices(cell)
@@ -415,21 +415,21 @@ impl<'p> SolveState<'p> {
         &self.puzzle.symbols[set][idx]
     }
 
-    pub fn regions(&self) -> impl Iterator<Item = RegionIndex> {
+    pub fn regions(&self) -> impl Iterator<Item = RegionId> {
         self.puzzle.regions()
     }
 
-    pub fn region(&self, region: RegionIndex) -> &Region {
+    pub fn region(&self, region: RegionId) -> &Region {
         self.puzzle.region(region)
     }
 
-    pub fn symbols(&self, set: SymbolSetIndex) -> impl Iterator<Item = SymbolId> {
+    pub fn symbols(&self, set: SymbolSetId) -> impl Iterator<Item = SymbolId> {
         self.puzzle.symbol_set(set).to_ids(set.0)
     }
 }
 
 impl SymbolChoice {
-    pub(crate) fn new(set: SymbolSetIndex, choice: RawSymbolChoice) -> Self {
+    pub(crate) fn new(set: SymbolSetId, choice: RawSymbolChoice) -> Self {
         Self { set, choice }
     }
 
