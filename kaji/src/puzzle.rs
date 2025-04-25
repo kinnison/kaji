@@ -1,6 +1,6 @@
 use crate::constraints::{Constraint, LogicalStep};
 use crate::consts::SYMBOL_SET_DIGITS;
-use crate::symbols::*;
+use crate::{symbols::*, Technique};
 
 use std::collections::HashMap;
 use std::fmt::Display;
@@ -9,6 +9,7 @@ use std::fmt::Display;
 pub struct Puzzle {
     symbols: Vec<RawSymbolSet>,
     constraints: Vec<Box<dyn Constraint>>,
+    techniques: Vec<Box<dyn Technique>>,
     cells: Vec<CellInfo>,
     cell_regions: Vec<Vec<RegionId>>,
     regions: Vec<Region>,
@@ -20,6 +21,7 @@ pub struct Puzzle {
 pub struct PuzzleBuilder {
     symbols: Vec<RawSymbolSet>,
     constraints: Vec<Box<dyn Constraint>>,
+    techniques: Vec<Box<dyn Technique>>,
     cells: Vec<CellInfo>,
     cell_regions: Vec<Vec<RegionId>>,
     regions: Vec<Region>,
@@ -101,6 +103,10 @@ impl PuzzleBuilder {
         self.constraints.push(Box::new(constraint));
     }
 
+    pub fn add_technique<T: Technique + 'static>(&mut self, technique: T) {
+        self.techniques.push(Box::new(technique))
+    }
+
     pub fn add_region(&mut self, region: Region) -> RegionId {
         assert!(
             !self.regions.iter().any(|r| r.name == region.name),
@@ -146,6 +152,7 @@ impl PuzzleBuilder {
         let Self {
             symbols,
             constraints,
+            techniques,
             cells,
             cell_regions,
             regions,
@@ -156,6 +163,7 @@ impl PuzzleBuilder {
         Puzzle {
             symbols,
             constraints,
+            techniques,
             cells,
             cell_regions,
             regions,
@@ -302,8 +310,8 @@ impl Puzzle {
 
     fn logical_step(&self, board: &mut SolveState) -> LogicalStep {
         let mut finished = true;
-        for constraint in &self.constraints {
-            match constraint.logical_step(board) {
+        for technique in &self.techniques {
+            match technique.logical_step(board) {
                 LogicalStep::NoAction => {
                     finished = false;
                 }

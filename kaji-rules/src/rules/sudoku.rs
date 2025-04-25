@@ -1,6 +1,8 @@
 //! Sudoku grids
 
-use kaji::{CellInfo, PuzzleBuilder, Region, Rule, Symbol};
+use kaji::{consts::SYMBOL_SET_DIGITS, CellInfo, PuzzleBuilder, Region, Rule, Symbol};
+
+use crate::techniques::{HiddenSingle, NakedSingle};
 
 use super::regions::NonRepeatRegion;
 
@@ -17,7 +19,7 @@ impl SudokuGrid {
 
 impl Rule for SudokuGrid {
     fn apply(&self, builder: &mut PuzzleBuilder) {
-        let mut set = builder.new_symbol_set("digits");
+        let mut set = builder.new_symbol_set(SYMBOL_SET_DIGITS);
         (1..=self.size).for_each(|n| set.push(Symbol::new(format!("{n}"))));
         let digits = set.finish();
         let mut cells = vec![];
@@ -78,5 +80,8 @@ impl Rule for SudokuGrid {
         {
             NonRepeatRegion::new(region, digits).apply(builder);
         }
+
+        builder.add_technique(NakedSingle);
+        builder.add_technique(HiddenSingle);
     }
 }

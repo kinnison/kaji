@@ -1,9 +1,9 @@
-use kaji::{CellIndex, Constraint, LogicalStep, SolveState};
+use kaji::{CellIndex, LogicalStep, SolveState, Technique};
 
 #[derive(Debug)]
 pub struct NakedSingle;
 
-impl Constraint for NakedSingle {
+impl Technique for NakedSingle {
     fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
         for cell in state.all_cells() {
             for set in state.symbol_sets() {
@@ -27,7 +27,7 @@ impl Constraint for NakedSingle {
 #[derive(Debug)]
 pub struct HiddenSingle;
 
-impl Constraint for HiddenSingle {
+impl Technique for HiddenSingle {
     fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
         #[derive(Clone)]
         enum SymbolState {

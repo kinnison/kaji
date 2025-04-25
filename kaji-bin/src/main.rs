@@ -3,9 +3,8 @@ use kaji_rules::rules::sudoku::SudokuGrid;
 
 fn main() {
     let mut builder = PuzzleBuilder::default();
-    SudokuGrid::new(6).apply(&mut builder);
 
-    let mut puzzle = builder.build();
+    SudokuGrid::new(6).apply(&mut builder);
 
     let digits = kaji_rules::constraints::GivenDigits::new(&[
         (1, 2, 5),
@@ -20,9 +19,9 @@ fn main() {
         (6, 5, 3),
     ]);
 
-    puzzle.add_constraint(digits);
-    puzzle.add_constraint(kaji_rules::constraints::NakedSingle);
-    puzzle.add_constraint(kaji_rules::constraints::HiddenSingle);
+    builder.add_constraint(digits);
+
+    let puzzle = builder.build();
 
     let board = puzzle.solve();
     puzzle.print_board(&board);
