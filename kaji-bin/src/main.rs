@@ -1,24 +1,27 @@
 use kaji::{PuzzleBuilder, Rule};
-use kaji_rules::rules::sudoku::SudokuGrid;
+use kaji_rules::{constraints::GivenDigits, rules::sudoku::SudokuGrid};
 
 fn main() {
     let mut builder = PuzzleBuilder::default();
 
     SudokuGrid::new(9).apply(&mut builder);
 
-    let digits = kaji_rules::constraints::GivenDigits::from_pattern(&[
-        "3.....4.1",
-        ".85.7.2.3",
-        "....1...8",
-        "..4....2.",
-        ".59......",
-        "...9...64",
-        "6....2...",
-        "..35.....",
-        "....67...",
+    let digits = GivenDigits::from_pattern(&[
+        "3.6.82...",
+        "..8...4..",
+        "...13.7..",
+        ".1.9..5..",
+        "....7..8.",
+        ".3...1..7",
+        "4....59..",
+        ".........",
+        "5.7.1.8..",
     ]);
 
     builder.add_constraint(digits);
+
+    // Remove this constraint to need finned xwing
+    builder.add_constraint(GivenDigits::new(&[(2, 5, 9)]));
 
     let puzzle = builder.build();
 
