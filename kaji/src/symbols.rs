@@ -49,7 +49,7 @@ pub struct SymbolId(usize);
 /// A SymbolChoice is a u32 which represents which symbols from a symbolset
 /// a given cell could have in a given board.
 #[repr(transparent)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct RawSymbolChoice(u32);
 
 impl Symbol {

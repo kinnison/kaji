@@ -50,7 +50,7 @@ pub struct CellIndex(usize);
 #[repr(transparent)]
 pub struct RegionId(usize);
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct SymbolSetId(usize);
 
@@ -60,6 +60,7 @@ pub struct SolveState<'p> {
     board: Board,
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct SymbolChoice {
     set: SymbolSetId,
     choice: RawSymbolChoice,
@@ -75,6 +76,19 @@ pub struct SymbolChoice {
 pub struct Board {
     nsymbols: usize,
     cells: Vec<RawSymbolChoice>,
+}
+
+/// Whether or not an action actually altered the board
+#[derive(Debug, Clone, Copy)]
+pub enum Effect {
+    Unchanged,
+    Changed,
+}
+
+impl Effect {
+    pub fn changed(self) -> bool {
+        matches!(self, Self::Changed)
+    }
 }
 
 impl PuzzleBuilder {
@@ -281,6 +295,19 @@ impl Puzzle {
         self.propagate_changes(board, cell);
     }
 
+    fn eliminate(&self, board: &mut Board, cell: CellIndex, symbol: SymbolId) -> Effect {
+        let (_set, symbolnr) = symbol.into_parts();
+        let choice = board.choice_mut(cell, symbol);
+        let choicecopy = *choice;
+        choice.unset(symbolnr);
+        if *choice != choicecopy {
+            self.propagate_changes(board, cell);
+            Effect::Changed
+        } else {
+            Effect::Unchanged
+        }
+    }
+
     fn propagate_changes(&self, board: &mut Board, cell: CellIndex) {
         for set in 0..self.symbols.len() {
             if let Some(symbol) = board.choice_set(cell, set).single_value() {
@@ -438,8 +465,12 @@ impl<'p> SolveState<'p> {
         self.puzzle.cell_at(row, col)
     }
 
-    pub fn set_symbol(&mut self, cell: CellIndex, digit: SymbolId) {
-        self.puzzle.set_symbol(&mut self.board, cell, digit);
+    pub fn set_symbol(&mut self, cell: CellIndex, symbol: SymbolId) {
+        self.puzzle.set_symbol(&mut self.board, cell, symbol);
+    }
+
+    pub fn eliminate(&mut self, cell: CellIndex, symbol: SymbolId) -> Effect {
+        self.puzzle.eliminate(&mut self.board, cell, symbol)
     }
 
     pub fn all_cells(&self) -> impl Iterator<Item = CellIndex> {
