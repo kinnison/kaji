@@ -1,5 +1,7 @@
 use std::{fmt::Display, ops::Index};
 
+use crate::{PuzzleBuilder, SymbolSetId};
+
 /// A puzzle cell symbol
 ///
 /// Cells can ultimately have only one symbol present in them
@@ -27,6 +29,12 @@ pub struct Symbol {
 pub(crate) struct RawSymbolSet {
     name: String,
     symbols: Vec<Symbol>,
+}
+
+#[derive(Debug)]
+pub struct SymbolSetBuilder<'p> {
+    puzzle_builder: &'p mut PuzzleBuilder,
+    set: RawSymbolSet,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -115,6 +123,30 @@ impl From<String> for Symbol {
 impl From<&str> for Symbol {
     fn from(val: &str) -> Self {
         Symbol::new(val)
+    }
+}
+
+impl<'p> SymbolSetBuilder<'p> {
+    pub(crate) fn new(puzzle_builder: &'p mut PuzzleBuilder, name: &str) -> Self {
+        Self {
+            puzzle_builder,
+            set: RawSymbolSet {
+                name: name.into(),
+                symbols: vec![],
+            },
+        }
+    }
+
+    pub fn push(&mut self, symbol: Symbol) {
+        self.set.symbols.push(symbol);
+    }
+
+    pub fn finish(self) -> SymbolSetId {
+        let Self {
+            puzzle_builder,
+            set,
+        } = self;
+        puzzle_builder.push_symbol_set(set)
     }
 }
 

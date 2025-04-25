@@ -10,6 +10,18 @@ pub struct Puzzle {
     symbols: Vec<RawSymbolSet>,
     constraints: Vec<Box<dyn Constraint>>,
     cells: Vec<CellInfo>,
+    cell_regions: Vec<Vec<RegionId>>,
+    regions: Vec<Region>,
+    implications: HashMap<(CellIndex, SymbolId), Vec<(CellIndex, SymbolId)>>,
+    rowcols: HashMap<(usize, usize), CellIndex>,
+}
+
+#[derive(Debug, Default)]
+pub struct PuzzleBuilder {
+    symbols: Vec<RawSymbolSet>,
+    constraints: Vec<Box<dyn Constraint>>,
+    cells: Vec<CellInfo>,
+    cell_regions: Vec<Vec<RegionId>>,
     regions: Vec<Region>,
     implications: HashMap<(CellIndex, SymbolId), Vec<(CellIndex, SymbolId)>>,
     rowcols: HashMap<(usize, usize), CellIndex>,
@@ -63,81 +75,97 @@ pub struct Board {
     cells: Vec<RawSymbolChoice>,
 }
 
-impl Puzzle {
-    pub fn new_sudoku(size: usize) -> Puzzle {
-        assert_eq!(size, 6);
-        let mut digits = RawSymbolSet::new(SYMBOL_SET_DIGITS);
-        digits.push("1");
-        digits.push("2");
-        digits.push("3");
-        digits.push("4");
-        digits.push("5");
-        digits.push("6");
-        let mut cells = Vec::new();
-        let mut rowcols = HashMap::new();
-        for row in 1..=6 {
-            for col in 1..=6 {
-                let name = format!("r{row}c{col}");
-                cells.push(CellInfo { name, row, col });
-                rowcols.insert((row, col), CellIndex(cells.len() - 1));
-            }
-        }
-        let mut regions = Vec::new();
-        for n in 1..=6 {
-            let rowregion = Region {
-                name: format!("Row {n}"),
-                cells: rowcols
-                    .iter()
-                    .filter_map(|v| if v.0 .0 == n { Some(*v.1) } else { None })
-                    .collect(),
-            };
-            regions.push(rowregion);
-            let colregion = Region {
-                name: format!("Column {n}"),
-                cells: rowcols
-                    .iter()
-                    .filter_map(|v| if v.0 .1 == n { Some(*v.1) } else { None })
-                    .collect(),
-            };
-            regions.push(colregion);
-            // Boxes are a bit more of a pain
-            let boxrow = ((n - 1) & !1) + 1;
-            let boxcol = 1 + (3 * ((n - 1) & 1));
-            let mut boxregion = Region {
-                name: format!("Box {n}"),
-                cells: vec![],
-            };
-            for row in boxrow..=boxrow + 1 {
-                for col in boxcol..=boxcol + 2 {
-                    boxregion.cells.push(rowcols[&(row, col)]);
-                }
-            }
-            regions.push(boxregion);
-        }
-        let mut ret = Self {
-            symbols: vec![digits],
-            constraints: vec![],
-            cells,
-            regions,
-            implications: HashMap::new(),
-            rowcols,
-        };
+impl PuzzleBuilder {
+    pub fn new_symbol_set(&mut self, name: &str) -> SymbolSetBuilder {
+        SymbolSetBuilder::new(self, name)
+    }
 
-        let digits = ret.symbols[0].to_ids(0).collect::<Vec<_>>();
-        for region in ret.regions() {
-            let cells = ret.region(region).to_cells();
-            for cell0 in 0..(cells.len() - 1) {
-                for digit in &digits {
-                    for cell1 in cell0 + 1..cells.len() {
-                        ret.add_inference(cells[cell0], *digit, cells[cell1], *digit);
-                    }
-                }
-            }
-        }
+    pub(crate) fn push_symbol_set(&mut self, set: RawSymbolSet) -> SymbolSetId {
+        self.symbols.push(set);
+        SymbolSetId(self.symbols.len() - 1)
+    }
 
+    pub fn new_cell(&mut self, cell: CellInfo) -> CellIndex {
+        assert!(
+            !self.rowcols.contains_key(&(cell.row, cell.col)),
+            "Attempted to insert duplicate row/col"
+        );
+        let ret = CellIndex(self.cells.len());
+        self.rowcols.insert((cell.row, cell.col), ret);
+        self.cells.push(cell);
+        self.cell_regions.push(vec![]);
         ret
     }
 
+    pub fn add_constraint<C: Constraint + 'static>(&mut self, constraint: C) {
+        self.constraints.push(Box::new(constraint));
+    }
+
+    pub fn add_region(&mut self, region: Region) -> RegionId {
+        assert!(
+            !self.regions.iter().any(|r| r.name == region.name),
+            "Attempted to insert duplicate for region {}",
+            region.name
+        );
+        let ret = RegionId(self.regions.len());
+        for CellIndex(cell) in region.cells.iter().copied() {
+            self.cell_regions[cell].push(ret);
+        }
+        self.regions.push(region);
+        ret
+    }
+
+    pub fn symbols(&self, set: SymbolSetId) -> impl Iterator<Item = SymbolId> {
+        self.symbols[set.0].to_ids(set.0)
+    }
+
+    pub fn region(&self, region: RegionId) -> &Region {
+        &self.regions[region.0]
+    }
+
+    pub fn add_inference(
+        &mut self,
+        cell0: CellIndex,
+        has: SymbolId,
+        cell1: CellIndex,
+        lacks: SymbolId,
+    ) {
+        // if cell0 is has, cell1 cannot be lacks
+        // corollary: if cell1 is lacks, cell0 cannot be has
+        self.implications
+            .entry((cell0, has))
+            .or_default()
+            .push((cell1, lacks));
+        self.implications
+            .entry((cell1, lacks))
+            .or_default()
+            .push((cell0, has));
+    }
+
+    pub fn build(self) -> Puzzle {
+        let Self {
+            symbols,
+            constraints,
+            cells,
+            cell_regions,
+            regions,
+            rowcols,
+            implications,
+        } = self;
+
+        Puzzle {
+            symbols,
+            constraints,
+            cells,
+            cell_regions,
+            regions,
+            implications,
+            rowcols,
+        }
+    }
+}
+
+impl Puzzle {
     pub fn regions(&self) -> impl Iterator<Item = RegionId> {
         (0..self.regions.len()).map(RegionId)
     }
@@ -312,6 +340,13 @@ impl Puzzle {
 }
 
 impl Region {
+    pub fn new(name: impl Into<String>, cells: impl IntoIterator<Item = CellIndex>) -> Self {
+        Self {
+            name: name.into(),
+            cells: cells.into_iter().collect(),
+        }
+    }
+
     pub fn to_cells(&self) -> Vec<CellIndex> {
         self.cells.clone()
     }
@@ -355,6 +390,16 @@ impl Board {
     fn choice_set(&self, idx: CellIndex, set: usize) -> RawSymbolChoice {
         let idx = idx.0 * self.nsymbols + set;
         self.cells[idx]
+    }
+}
+
+impl CellInfo {
+    pub fn new(name: impl Into<String>, row: usize, col: usize) -> Self {
+        Self {
+            name: name.into(),
+            row,
+            col,
+        }
     }
 }
 

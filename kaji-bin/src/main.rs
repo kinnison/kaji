@@ -1,7 +1,11 @@
-use kaji::Puzzle;
+use kaji::{PuzzleBuilder, Rule};
+use kaji_rules::rules::sudoku::SudokuGrid;
 
 fn main() {
-    let mut puzzle = Puzzle::new_sudoku(6);
+    let mut builder = PuzzleBuilder::default();
+    SudokuGrid::new(6).apply(&mut builder);
+
+    let mut puzzle = builder.build();
 
     let digits = kaji_rules::constraints::GivenDigits::new(&[
         (1, 2, 5),
