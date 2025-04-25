@@ -11,6 +11,18 @@ impl GivenDigits {
             digits: givens.to_vec(),
         }
     }
+
+    pub fn from_pattern(pattern: &[&str]) -> Self {
+        let mut digits = vec![];
+        for (rownr, row) in pattern.iter().enumerate() {
+            for (colnr, digitch) in row.chars().enumerate() {
+                if let '0'..='9' = digitch {
+                    digits.push(((rownr + 1), (colnr + 1), ((digitch as u8) - b'0') as usize))
+                }
+            }
+        }
+        Self { digits }
+    }
 }
 
 impl Constraint for GivenDigits {
