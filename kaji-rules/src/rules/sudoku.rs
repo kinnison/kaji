@@ -81,7 +81,7 @@ impl Rule for SudokuGrid {
             NonRepeatRegion::new(region, digits).apply(builder);
         }
 
-        builder.add_technique(NakedSingle);
-        builder.add_technique(HiddenSingle);
+        builder.add_technique(NakedSingle::new(digits));
+        builder.add_technique(HiddenSingle::new(digits));
     }
 }
