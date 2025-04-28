@@ -4,7 +4,7 @@ use crate::{symbols::*, Technique};
 
 use std::collections::HashMap;
 use std::fmt::Display;
-use std::ops::BitOr;
+use std::ops::{BitAnd, BitOr};
 
 #[derive(Debug)]
 pub struct Puzzle {
@@ -61,7 +61,7 @@ pub struct SolveState<'p> {
     board: Board,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SymbolChoice {
     set: SymbolSetId,
     choice: RawSymbolChoice,
@@ -309,6 +309,18 @@ impl Puzzle {
         }
     }
 
+    fn restrict(&self, board: &mut Board, cell: CellIndex, symbols: SymbolChoice) -> Effect {
+        let choice = board.choice_mut_by_set(cell, symbols.set);
+        let choicecopy = *choice;
+        *choice &= symbols.choice;
+        if *choice != choicecopy {
+            self.propagate_changes(board, cell);
+            Effect::Changed
+        } else {
+            Effect::Unchanged
+        }
+    }
+
     fn propagate_changes(&self, board: &mut Board, cell: CellIndex) {
         for set in 0..self.symbols.len() {
             if let Some(symbol) = board.choice_set(cell, set).single_value() {
@@ -423,6 +435,11 @@ impl Board {
         &mut self.cells[idx]
     }
 
+    fn choice_mut_by_set(&mut self, idx: CellIndex, set: SymbolSetId) -> &mut RawSymbolChoice {
+        let idx = idx.0 * self.nsymbols + set.0;
+        &mut self.cells[idx]
+    }
+
     fn choice_set(&self, idx: CellIndex, set: usize) -> RawSymbolChoice {
         let idx = idx.0 * self.nsymbols + set;
         self.cells[idx]
@@ -472,6 +489,10 @@ impl<'p> SolveState<'p> {
 
     pub fn eliminate(&mut self, cell: CellIndex, symbol: SymbolId) -> Effect {
         self.puzzle.eliminate(&mut self.board, cell, symbol)
+    }
+
+    pub fn restrict(&mut self, cell: CellIndex, symbols: SymbolChoice) -> Effect {
+        self.puzzle.restrict(&mut self.board, cell, symbols)
     }
 
     pub fn all_cells(&self) -> impl Iterator<Item = CellIndex> {
@@ -548,11 +569,24 @@ impl SymbolChoice {
 }
 
 impl BitOr for SymbolChoice {
-    type Output = SymbolChoice;
+    type Output = Self;
 
     fn bitor(self, rhs: Self) -> Self::Output {
         assert_eq!(self.set, rhs.set);
         let choice = self.choice | rhs.choice;
+        Self {
+            set: self.set,
+            choice,
+        }
+    }
+}
+
+impl BitAnd for SymbolChoice {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        assert_eq!(self.set, rhs.set);
+        let choice = self.choice & rhs.choice;
         Self {
             set: self.set,
             choice,

@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    ops::{BitOr, Index},
+    ops::{BitAnd, BitAndAssign, BitOr, Index},
 };
 
 use crate::{PuzzleBuilder, SymbolSetId};
@@ -216,6 +216,20 @@ impl BitOr for RawSymbolChoice {
 
     fn bitor(self, rhs: Self) -> Self::Output {
         Self((self.0 & Self::VALUE_MASK) | (rhs.0 & Self::VALUE_MASK))
+    }
+}
+
+impl BitAnd for RawSymbolChoice {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0 & Self::VALUE_MASK)
+    }
+}
+
+impl BitAndAssign for RawSymbolChoice {
+    fn bitand_assign(&mut self, rhs: Self) {
+        self.0 &= rhs.0 & Self::VALUE_MASK;
     }
 }
 
