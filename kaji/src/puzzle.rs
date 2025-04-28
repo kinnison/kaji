@@ -47,7 +47,7 @@ pub struct Region {
 #[repr(transparent)]
 pub struct CellIndex(usize);
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct RegionId(usize);
 
@@ -511,6 +511,14 @@ impl<'p> SolveState<'p> {
     pub fn symbols(&self, set: SymbolSetId) -> impl Iterator<Item = SymbolId> {
         self.puzzle.symbol_set(set).to_ids(set.0)
     }
+
+    pub fn regions_for_cell(&self, cell: CellIndex) -> impl Iterator<Item = RegionId> {
+        let v = self
+            .regions()
+            .filter(|r| self.region(*r).to_cells().contains(&cell))
+            .collect::<Vec<_>>();
+        v.into_iter()
+    }
 }
 
 impl SymbolChoice {
@@ -531,6 +539,11 @@ impl SymbolChoice {
     pub fn options(&self) -> impl Iterator<Item = SymbolId> {
         let set = self.set.0;
         self.choice.options().map(move |v| SymbolId::new(set, v))
+    }
+
+    pub fn can_be(&self, symbol: SymbolId) -> bool {
+        assert_eq!(self.set.0, symbol.set_index());
+        self.choice.can_be(symbol.symbol_index())
     }
 }
 

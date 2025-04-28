@@ -165,6 +165,9 @@ impl SymbolId {
     pub fn symbol_index(&self) -> usize {
         self.0 & 31
     }
+    pub fn set_index(&self) -> usize {
+        self.0 >> 5
+    }
 }
 
 impl RawSymbolChoice {
