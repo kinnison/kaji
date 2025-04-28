@@ -38,7 +38,14 @@ impl Technique for NakedTuple {
                     if found_tuple.options().count() != tsize {
                         continue;
                     }
-                    let mut changed = false;
+                    let region = state.region(region);
+                    let mut acted =
+                        LogicalStep::action(format!("Naked {tsize}-tuple in {region}: "));
+                    acted.push_cells(cells.iter().copied().map(|cell| state.cell_info(cell)));
+                    acted.push_str("; removed ");
+                    acted.push_symbols(found_tuple.options().map(|sym| state.symbol(sym)));
+                    acted.push_str(" from ");
+                    let mut changed = HashSet::new();
                     for other_cell in unsolved_cells
                         .iter()
                         .copied()
@@ -46,12 +53,13 @@ impl Technique for NakedTuple {
                     {
                         for elim in found_tuple.options() {
                             if state.eliminate(other_cell, elim).changed() {
-                                changed = true;
+                                changed.insert(other_cell);
                             }
                         }
                     }
-                    if changed {
-                        return LogicalStep::Acted(format!("Found a {tsize}-tuple, did some work"));
+                    if !changed.is_empty() {
+                        acted.push_cells(changed.into_iter().map(|cell| state.cell_info(cell)));
+                        return acted;
                     }
                 }
             }
