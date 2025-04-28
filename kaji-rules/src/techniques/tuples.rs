@@ -7,11 +7,12 @@ use itertools::Itertools;
 #[derive(Debug)]
 pub struct NakedTuple {
     set: SymbolSetId,
+    max_n: usize,
 }
 
 impl NakedTuple {
-    pub fn new(set: SymbolSetId) -> Self {
-        Self { set }
+    pub fn new(set: SymbolSetId, max_n: usize) -> Self {
+        Self { set, max_n }
     }
 }
 
@@ -27,7 +28,7 @@ impl Technique for NakedTuple {
             if unsolved_cells.len() < 3 {
                 continue;
             }
-            for tsize in 2..unsolved_cells.len() {
+            for tsize in 2..(self.max_n + 1).min(unsolved_cells.len()) {
                 for cells in unsolved_cells.iter().copied().combinations(tsize) {
                     let found_tuple = cells
                         .iter()
