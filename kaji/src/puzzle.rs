@@ -1,5 +1,4 @@
 use crate::constraints::{Constraint, LogicalStep};
-use crate::consts::SYMBOL_SET_DIGITS;
 use crate::{symbols::*, Technique};
 
 use std::collections::HashMap;

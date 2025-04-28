@@ -1,6 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
-use kaji::{CellIndex, LogicalStep, SolveState, SymbolChoice, SymbolId, SymbolSetId, Technique};
+use kaji::{LogicalStep, SolveState, SymbolSetId, Technique};
 
 use itertools::Itertools;
 

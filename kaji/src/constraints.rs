@@ -1,4 +1,4 @@
-use crate::{puzzle::SolveState, CellIndex, CellInfo, Symbol};
+use crate::{puzzle::SolveState, CellInfo, Symbol};
 
 pub trait Constraint: std::fmt::Debug {
     /// Prepare a board ready for "playing".

@@ -62,17 +62,6 @@ impl Symbol {
 }
 
 impl RawSymbolSet {
-    pub fn new(name: impl Into<String>) -> Self {
-        Self {
-            name: name.into(),
-            symbols: vec![],
-        }
-    }
-
-    pub fn push(&mut self, symbol: impl Into<Symbol>) {
-        self.symbols.push(symbol.into());
-    }
-
     pub fn to_ids(&self, set: usize) -> impl Iterator<Item = SymbolId> {
         (0..self.symbols.len()).map(move |s| SymbolId::new(set, s))
     }
