@@ -84,8 +84,9 @@ impl Rule for SudokuGrid {
         builder.add_technique(NakedSingle::new(digits));
         builder.add_technique(HiddenSingle::new(digits));
         builder.add_technique(NakedTuple::new(digits, 3));
-        builder.add_technique(HiddenTuple::new(digits));
+        builder.add_technique(HiddenTuple::new(digits, 3));
         builder.add_technique(PointingSymbol::new(digits));
         builder.add_technique(NakedTuple::new(digits, self.size - 1));
+        builder.add_technique(HiddenTuple::new(digits, self.size - 1));
     }
 }
