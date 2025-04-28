@@ -533,11 +533,7 @@ impl<'p> SolveState<'p> {
     }
 
     pub fn regions_for_cell(&self, cell: CellIndex) -> impl Iterator<Item = RegionId> {
-        let v = self
-            .regions()
-            .filter(|r| self.region(*r).to_cells().contains(&cell))
-            .collect::<Vec<_>>();
-        v.into_iter()
+        self.puzzle.cell_regions[cell.0].clone().into_iter()
     }
 }
 
