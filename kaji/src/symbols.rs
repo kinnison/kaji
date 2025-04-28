@@ -1,4 +1,7 @@
-use std::{fmt::Display, ops::Index};
+use std::{
+    fmt::Display,
+    ops::{BitOr, Index},
+};
 
 use crate::{PuzzleBuilder, SymbolSetId};
 
@@ -202,6 +205,14 @@ impl RawSymbolChoice {
         OptionIter {
             mask: self.0 & Self::VALUE_MASK,
         }
+    }
+}
+
+impl BitOr for RawSymbolChoice {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self((self.0 & Self::VALUE_MASK) | (rhs.0 & Self::VALUE_MASK))
     }
 }
 

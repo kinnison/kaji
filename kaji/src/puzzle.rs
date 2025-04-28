@@ -4,6 +4,7 @@ use crate::{symbols::*, Technique};
 
 use std::collections::HashMap;
 use std::fmt::Display;
+use std::ops::BitOr;
 
 #[derive(Debug)]
 pub struct Puzzle {
@@ -530,5 +531,18 @@ impl SymbolChoice {
     pub fn options(&self) -> impl Iterator<Item = SymbolId> {
         let set = self.set.0;
         self.choice.options().map(move |v| SymbolId::new(set, v))
+    }
+}
+
+impl BitOr for SymbolChoice {
+    type Output = SymbolChoice;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        assert_eq!(self.set, rhs.set);
+        let choice = self.choice | rhs.choice;
+        Self {
+            set: self.set,
+            choice,
+        }
     }
 }

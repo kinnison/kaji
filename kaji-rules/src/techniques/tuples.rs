@@ -2,6 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use kaji::{CellIndex, LogicalStep, SolveState, SymbolChoice, SymbolId, SymbolSetId, Technique};
 
+use itertools::Itertools;
+
 #[derive(Debug)]
 pub struct NakedTuple {
     set: SymbolSetId,
@@ -16,49 +18,40 @@ impl NakedTuple {
 impl Technique for NakedTuple {
     fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
         for region in state.regions() {
-            let region_cells = state
+            let unsolved_cells = state
                 .region(region)
                 .to_cells()
                 .into_iter()
-                .collect::<HashSet<_>>();
-            let mut choices: HashMap<SymbolChoice, HashSet<CellIndex>> = HashMap::new();
-            for cell in region_cells.iter().copied() {
-                let choice = state.choices(cell, self.set);
-                if !choice.solved() {
-                    choices.entry(choice).or_default().insert(cell);
-                }
+                .filter(|cell| !state.choices(*cell, self.set).solved())
+                .collect::<Vec<_>>();
+            if unsolved_cells.len() < 3 {
+                continue;
             }
-            // TODO: Ideally we need to take groups of symbol choices
-            // union them together, and check the cell count.
-            // otherwise a triple of ab abc bc doesn't work.
-            for (choice, cells) in choices {
-                if choice.options().count() == cells.len() {
-                    // The n cells in cells all share the same n options
-                    let region = state.region(region);
-                    let mut action = format!("{}-tuple found in {region} (", cells.len());
-                    for cell in cells.iter().copied() {
-                        let cell = state.cell_info(cell);
-                        action.push_str(&format!("{cell}, "));
+            for tsize in 2..unsolved_cells.len() {
+                for cells in unsolved_cells.iter().copied().combinations(tsize) {
+                    let found_tuple = cells
+                        .iter()
+                        .copied()
+                        .map(|cell| state.choices(cell, self.set))
+                        .reduce(|acc, choice| acc | choice)
+                        .expect("Unable to reduce symbol choice set");
+                    if found_tuple.options().count() != tsize {
+                        continue;
                     }
-                    action.pop();
-                    action.pop();
-                    action.push_str(") eliminates ");
                     let mut changed = false;
-                    for cell in region_cells.difference(&cells).copied() {
-                        for option in choice.options() {
-                            let did = state.eliminate(cell, option).changed();
-                            if did {
-                                let symbol = state.symbol(option);
-                                let cell = state.cell_info(cell);
-                                action.push_str(&format!("{symbol} from {cell}, "));
+                    for other_cell in unsolved_cells
+                        .iter()
+                        .copied()
+                        .filter(|cell| !cells.contains(cell))
+                    {
+                        for elim in found_tuple.options() {
+                            if state.eliminate(other_cell, elim).changed() {
                                 changed = true;
                             }
                         }
                     }
-                    action.pop();
-                    action.pop();
                     if changed {
-                        return LogicalStep::Acted(action);
+                        return LogicalStep::Acted(format!("Found a {tsize}-tuple, did some work"));
                     }
                 }
             }
