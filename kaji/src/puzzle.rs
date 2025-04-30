@@ -6,6 +6,7 @@ use std::fmt::Display;
 use std::ops::{BitAnd, BitOr};
 
 #[derive(Debug)]
+/// A representation of a puzzle which may be solved
 pub struct Puzzle {
     symbols: Vec<RawSymbolSet>,
     constraints: Vec<Box<dyn Constraint>>,
@@ -18,6 +19,7 @@ pub struct Puzzle {
 }
 
 #[derive(Debug, Default)]
+/// A way to construct [`Puzzle`]s piece by piece
 pub struct PuzzleBuilder {
     symbols: Vec<RawSymbolSet>,
     constraints: Vec<Box<dyn Constraint>>,
@@ -29,6 +31,11 @@ pub struct PuzzleBuilder {
     rowcols: HashMap<(usize, usize), CellIndex>,
 }
 
+/// Information about a cell in a [`Puzzle`]
+///
+/// Cells are in an orthogonal grid, but are not necessarily tightly
+/// packed.  Each cell has a row and column number associated, and
+/// that is a unique coordinate for the cell.
 #[derive(Debug)]
 pub struct CellInfo {
     name: String,
@@ -36,30 +43,45 @@ pub struct CellInfo {
     col: usize,
 }
 
+/// A set of cells with some kind of uniqueness constraint
+///
+/// A region is a set of cells where one or more of the
+/// [`SymbolSet`][SymbolSetId]s must be unique within the
+/// region for the puzzle to be considered solved.
 #[derive(Debug)]
 pub struct Region {
     name: String,
     cells: Vec<CellIndex>,
 }
 
+/// An index into the [cells][CellInfo] in a [`Puzzle`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct CellIndex(usize);
 
+/// An index into the [`Region`]s in a [`Puzzle`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct RegionId(usize);
 
+/// An index into the `SymbolSets` in a [`Puzzle`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct SymbolSetId(usize);
 
 /// A representation of an in-progress solve.
+///
+/// In practice this encapsulates a [`&Puzzle`][Puzzle]
+/// and an in-progress [`Board`]
 pub struct SolveState<'p> {
     puzzle: &'p Puzzle,
     board: Board,
 }
 
+/// A representation of which [`Symbol`]s are available.
+///
+/// Within a [`Board`] each cell has a [`SymbolChoice`]
+/// for each [`SymbolSet`][SymbolSetId].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SymbolChoice {
     set: SymbolSetId,
@@ -81,7 +103,9 @@ pub struct Board {
 /// Whether or not an action actually altered the board
 #[derive(Debug, Clone, Copy)]
 pub enum Effect {
+    /// Nothing changed on the [`Board`]
     Unchanged,
+    /// Something changed on the [`Board`]
     Changed,
 }
 

@@ -8,7 +8,7 @@ use crate::{PuzzleBuilder, SymbolSetId};
 /// A puzzle cell symbol
 ///
 /// Cells can ultimately have only one symbol present in them
-/// per [`SymbolSet`][crate::SymbolSetIndex] associated with
+/// per [`SymbolSet`][crate::SymbolSetId] associated with
 /// the [`Puzzle`][crate::Puzzle]
 #[derive(Debug)]
 pub struct Symbol {
@@ -34,6 +34,11 @@ pub(crate) struct RawSymbolSet {
     symbols: Vec<Symbol>,
 }
 
+/// Build a symbol set
+///
+/// In order to construct a symbol set for a [`PuzzleBuilder`]
+/// this utility builder should be used.  Once this is [built][SymbolSetBuilder::finish]
+/// the puzzle will contain the set of symbols inserted here.
 #[derive(Debug)]
 pub struct SymbolSetBuilder<'p> {
     puzzle_builder: &'p mut PuzzleBuilder,
@@ -93,6 +98,7 @@ impl Index<usize> for RawSymbolSet {
 }
 
 impl Symbol {
+    /// Create a new symbol with the given name
     pub fn new(display: impl Into<String>) -> Self {
         Self {
             name: display.into(),
@@ -129,10 +135,12 @@ impl<'p> SymbolSetBuilder<'p> {
         }
     }
 
+    /// Add the given symbol to this set
     pub fn push(&mut self, symbol: Symbol) {
         self.set.symbols.push(symbol);
     }
 
+    /// Add this symbol set in its entirety to the [`PuzzleBuilder`]
     pub fn finish(self) -> SymbolSetId {
         let Self {
             puzzle_builder,
@@ -151,10 +159,10 @@ impl SymbolId {
         (self.0 >> 5, self.0 & 31)
     }
 
-    pub fn symbol_index(&self) -> usize {
+    pub(crate) fn symbol_index(&self) -> usize {
         self.0 & 31
     }
-    pub fn set_index(&self) -> usize {
+    pub(crate) fn set_index(&self) -> usize {
         self.0 >> 5
     }
 }
