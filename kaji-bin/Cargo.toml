@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 kaji = { path = "../kaji" }
 kaji-rules = { path = "../kaji-rules" }
+kaji-loader = { path = "../kaji-loader" }

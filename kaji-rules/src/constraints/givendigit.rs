@@ -1,4 +1,5 @@
 use kaji::{consts::SYMBOL_SET_DIGITS, Constraint, SolveState};
+use kaji_loader::raw::RawPuzzleData;
 
 #[derive(Debug)]
 pub struct GivenDigits {
@@ -6,7 +7,15 @@ pub struct GivenDigits {
 }
 
 impl GivenDigits {
-    pub fn new(givens: &[(usize, usize, usize)]) -> Self {
+    pub fn new(raw: &RawPuzzleData) -> Self {
+        let mut givens = vec![];
+        for (rrow, row) in raw.cells.iter().enumerate() {
+            for (rcol, cell) in row.iter().enumerate() {
+                if let Some(value) = cell.value {
+                    givens.push((rrow + 1, rcol + 1, value));
+                }
+            }
+        }
         Self {
             digits: givens.to_vec(),
         }

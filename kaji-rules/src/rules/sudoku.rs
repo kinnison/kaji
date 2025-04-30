@@ -1,6 +1,7 @@
 //! Sudoku grids
 
 use kaji::{consts::SYMBOL_SET_DIGITS, CellInfo, PuzzleBuilder, Region, Rule, Symbol};
+use kaji_loader::raw::{RawPuzzleData, RawRowColPair};
 
 use crate::techniques::{HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol};
 
@@ -8,12 +9,17 @@ use super::regions::NonRepeatRegion;
 
 pub struct SudokuGrid {
     size: usize,
+    regions: Vec<Vec<RawRowColPair>>,
 }
 
 impl SudokuGrid {
-    pub fn new(size: usize) -> Self {
+    pub fn new(raw: &RawPuzzleData) -> Self {
+        let size = raw.cells.len();
         assert!([4, 6, 8, 9].contains(&size));
-        Self { size }
+        Self {
+            size,
+            regions: raw.regions.clone(),
+        }
     }
 }
 
@@ -35,10 +41,12 @@ impl Rule for SudokuGrid {
             });
         });
 
-        let rows = rows
-            .into_iter()
+        let region_rows = rows
+            .iter()
             .enumerate()
-            .map(|(n, row)| builder.add_region(Region::new(format!("Row {}", n + 1), row)))
+            .map(|(n, row)| {
+                builder.add_region(Region::new(format!("Row {}", n + 1), row.iter().copied()))
+            })
             .collect::<Vec<_>>();
 
         let cols = cols
@@ -49,31 +57,16 @@ impl Rule for SudokuGrid {
 
         let mut boxes = vec![];
 
-        // 4=2x2 6=3x2 8=4x2, 9=3x3
-        let boxw = if self.size == 9 { 3 } else { self.size >> 1 };
-        let boxh = if self.size == 9 { 3 } else { 2 };
-
-        let mut srow = 1;
-        let mut scol = 1;
-        for boxr in 1..=self.size {
-            let mut boxcells = vec![];
-            for brow in 0..boxh {
-                for bcol in 0..boxw {
-                    let cellrow = srow + brow;
-                    let cellcol = scol + bcol;
-                    let cellnr = ((cellrow - 1) * self.size) + cellcol - 1;
-                    boxcells.push(cells[cellnr]);
-                }
-            }
-            boxes.push(builder.add_region(Region::new(format!("Box {boxr}"), boxcells)));
-
-            scol += boxw;
-            if scol > self.size {
-                scol = 1;
-                srow += boxh;
-            }
+        for (rrno, rawregion) in self.regions.iter().enumerate() {
+            let boxname = format!("Box {}", rrno + 1);
+            let boxcells = rawregion
+                .iter()
+                .copied()
+                .map(|RawRowColPair(rrow, rcol)| rows[rrow][rcol]);
+            boxes.push(builder.add_region(Region::new(boxname, boxcells)));
         }
-        for region in rows
+
+        for region in region_rows
             .into_iter()
             .chain(cols.into_iter())
             .chain(boxes.into_iter())
