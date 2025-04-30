@@ -159,7 +159,14 @@ impl SymbolId {
         (self.0 >> 5, self.0 & 31)
     }
 
-    pub(crate) fn symbol_index(&self) -> usize {
+    /// Retrieve a raw [`usize`] which represents the index
+    /// of this symbol in its set.
+    ///
+    /// **NOTE**: This is not guaranteed stable between runs
+    /// and should **only** be used to index an array of
+    /// symbols or similar in a [`Technique`][crate::Technique]
+    /// or [`Constraint`][crate::Constraint].
+    pub fn symbol_index(&self) -> usize {
         self.0 & 31
     }
     pub(crate) fn set_index(&self) -> usize {
