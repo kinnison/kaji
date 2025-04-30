@@ -281,6 +281,38 @@ impl Puzzle {
         }
     }
 
+    pub fn solution(&self, board: &Board) -> String {
+        assert!(board.solved());
+        assert_eq!(self.cells.len() * self.symbols.len(), board.cells.len());
+
+        let mut ret = String::new();
+        let mut minrow = usize::MAX;
+        let mut mincol = usize::MAX;
+        let mut maxrow = usize::MIN;
+        let mut maxcol = usize::MIN;
+        for &(row, col) in self.rowcols.keys() {
+            minrow = minrow.min(row);
+            mincol = mincol.min(col);
+            maxrow = maxrow.max(row);
+            maxcol = maxcol.max(col);
+        }
+
+        for row in minrow..=maxrow {
+            for col in mincol..=maxcol {
+                if let Some(cell) = self.rowcols.get(&(row, col)).copied() {
+                    for (set, choice) in board.choices(cell).enumerate() {
+                        if let Some(value) = choice.single_value() {
+                            let symbol = &self.symbols[set][value];
+                            ret.push_str(&format!("{symbol}"));
+                        }
+                    }
+                }
+            }
+        }
+
+        ret
+    }
+
     pub fn add_constraint<C: Constraint + 'static>(&mut self, constraint: C) {
         self.constraints.push(Box::new(constraint));
     }
@@ -443,7 +475,7 @@ impl Board {
         }
     }
 
-    fn solved(&self) -> bool {
+    pub fn solved(&self) -> bool {
         self.cells.iter().all(|c| c.solved())
     }
 
