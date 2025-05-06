@@ -239,6 +239,14 @@ impl Puzzle {
             .push((cell0, has));
     }
 
+    pub fn sees(&self, cell: CellIndex, symbol: SymbolId) -> impl Iterator<Item = CellIndex> + '_ {
+        self.implications
+            .get(&(cell, symbol))
+            .map(|v| v.iter().map(|e| e.0))
+            .into_iter()
+            .flatten()
+    }
+
     fn initial_board(&self) -> SolveState {
         let mut state = SolveState::new(self, Board::empty(self.cells.len(), &self.symbols));
         for constraint in &self.constraints {
@@ -595,6 +603,10 @@ impl<'p> SolveState<'p> {
 
     pub fn regions_for_cell(&self, cell: CellIndex) -> impl Iterator<Item = RegionId> {
         self.puzzle.cell_regions[cell.0].clone().into_iter()
+    }
+
+    pub fn sees(&self, cell: CellIndex, symbol: SymbolId) -> impl Iterator<Item = CellIndex> + 'p {
+        self.puzzle.sees(cell, symbol)
     }
 }
 
