@@ -3,7 +3,7 @@
 use kaji::{consts::SYMBOL_SET_DIGITS, CellInfo, PuzzleBuilder, Region, Rule, Symbol};
 use kaji_loader::raw::{RawPuzzleData, RawRowColPair};
 
-use crate::techniques::{HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol};
+use crate::techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol};
 
 use super::regions::NonRepeatRegion;
 
@@ -81,5 +81,6 @@ impl Rule for SudokuGrid {
         builder.add_technique(PointingSymbol::new(digits));
         builder.add_technique(NakedTuple::new(digits, self.size - 1));
         builder.add_technique(HiddenTuple::new(digits, self.size - 1));
+        builder.add_technique(Fish::new(2, digits));
     }
 }
