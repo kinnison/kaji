@@ -242,7 +242,10 @@ impl Puzzle {
     pub fn sees(&self, cell: CellIndex, symbol: SymbolId) -> impl Iterator<Item = CellIndex> + '_ {
         self.implications
             .get(&(cell, symbol))
-            .map(|v| v.iter().map(|e| e.0))
+            .map(move |v| {
+                v.iter()
+                    .filter_map(move |e| if e.1 == symbol { Some(e.0) } else { None })
+            })
             .into_iter()
             .flatten()
     }
