@@ -453,6 +453,11 @@ impl Region {
     pub fn to_cells(&self) -> Vec<CellIndex> {
         self.cells.clone()
     }
+
+    #[allow(clippy::len_without_is_empty)]
+    pub fn len(&self) -> usize {
+        self.cells.len()
+    }
 }
 
 impl Display for Region {
