@@ -451,6 +451,20 @@ impl Puzzle {
         }
         board.into_board()
     }
+
+    fn can_see(
+        &self,
+        cell1: CellIndex,
+        symbol1: SymbolId,
+        cell2: CellIndex,
+        symbol2: SymbolId,
+    ) -> bool {
+        if let Some(pairs) = self.implications.get(&(cell1, symbol1)) {
+            pairs.contains(&(cell2, symbol2))
+        } else {
+            false
+        }
+    }
 }
 
 impl Region {
@@ -610,6 +624,16 @@ impl<'p> SolveState<'p> {
 
     pub fn sees(&self, cell: CellIndex, symbol: SymbolId) -> impl Iterator<Item = CellIndex> + 'p {
         self.puzzle.sees(cell, symbol)
+    }
+
+    pub fn can_see(
+        &self,
+        cell1: CellIndex,
+        symbol1: SymbolId,
+        cell2: CellIndex,
+        symbol2: SymbolId,
+    ) -> bool {
+        self.puzzle.can_see(cell1, symbol1, cell2, symbol2)
     }
 }
 
