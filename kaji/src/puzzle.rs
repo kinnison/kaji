@@ -209,6 +209,14 @@ impl PuzzleBuilder {
             rowcols,
         }
     }
+
+    pub fn cell_info(&self, cell: CellIndex) -> &CellInfo {
+        &self.cells[cell.0]
+    }
+
+    pub fn cell_at(&self, row: usize, col: usize) -> Option<CellIndex> {
+        self.rowcols.get(&(row, col)).copied()
+    }
 }
 
 impl Puzzle {
@@ -538,6 +546,14 @@ impl CellInfo {
             row,
             col,
         }
+    }
+
+    pub fn row(&self) -> usize {
+        self.row
+    }
+
+    pub fn col(&self) -> usize {
+        self.col
     }
 }
 
