@@ -5,11 +5,13 @@ use kaji_loader::raw::{RawPuzzleData, RawRowColPair};
 
 use crate::techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol};
 
-use super::regions::NonRepeatRegion;
+use super::{antioffset::AntiOffset, regions::NonRepeatRegion};
 
 pub struct SudokuGrid {
     size: usize,
     regions: Vec<Vec<RawRowColPair>>,
+    antiknight: bool,
+    antiking: bool,
 }
 
 impl SudokuGrid {
@@ -19,6 +21,8 @@ impl SudokuGrid {
         Self {
             size,
             regions: raw.regions.clone(),
+            antiknight: raw.metadata.antiknight,
+            antiking: raw.metadata.antiking,
         }
     }
 }
@@ -72,6 +76,13 @@ impl Rule for SudokuGrid {
             .chain(boxes.into_iter())
         {
             NonRepeatRegion::new(region, digits).apply(builder);
+        }
+
+        if self.antiking {
+            AntiOffset::new(1, 1, digits, cells.clone()).apply(builder);
+        }
+        if self.antiknight {
+            AntiOffset::new(1, 2, digits, cells.clone()).apply(builder);
         }
 
         builder.add_technique(NakedSingle::new(digits));
