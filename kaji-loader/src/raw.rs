@@ -13,6 +13,10 @@ pub struct RawPuzzleData {
 pub struct RawPuzzleMetadata {
     pub title: Option<String>,
     pub solution: Option<String>,
+    #[serde(default)]
+    pub antiking: bool,
+    #[serde(default)]
+    pub antiknight: bool,
 }
 
 #[derive(Debug, Deserialize)]
