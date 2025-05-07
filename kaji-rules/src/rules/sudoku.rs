@@ -82,5 +82,6 @@ impl Rule for SudokuGrid {
         builder.add_technique(NakedTuple::new(digits, self.size - 1));
         builder.add_technique(HiddenTuple::new(digits, self.size - 1));
         builder.add_technique(Fish::new(2, digits));
+        builder.add_technique(Fish::new(3, digits));
     }
 }

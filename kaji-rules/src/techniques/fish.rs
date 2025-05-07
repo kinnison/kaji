@@ -37,7 +37,7 @@ impl Technique for Fish {
             .collect::<Vec<_>>();
         for symbol in state.symbols(self.set) {
             'region_set: for regions_to_use in regions.iter().copied().combinations(self.size) {
-                let possible_cells = regions_to_use
+                let fish_cells = regions_to_use
                     .iter()
                     .copied()
                     .map(|region| {
@@ -52,14 +52,22 @@ impl Technique for Fish {
                             .collect::<HashSet<_>>()
                     })
                     .collect::<Vec<_>>();
-                // Check if all regions have the right possibility count
-                if possible_cells.iter().any(|r| r.len() != self.size) {
+                // Check if all regions have the right possibility count, ie. at least 2 and
+                // no more than the fish's size
+                if fish_cells
+                    .iter()
+                    .any(|r| r.len() < 2 || r.len() > self.size)
+                {
                     continue 'region_set;
                 }
-                for (r1, r2) in possible_cells.iter().tuple_combinations() {
+                // We may need to rework the overlapping cells when we get to jellyfish
+                for (mut r1, mut r2) in fish_cells.iter().tuple_combinations() {
                     // Check if any two of the regions picked have overlapping cells
                     if r1.intersection(r2).count() > 0 {
                         continue 'region_set;
+                    }
+                    if r1.len() < r2.len() {
+                        std::mem::swap(&mut r1, &mut r2);
                     }
                     // No overlapping cells, do we have unique seeing pairs?
                     let mut seen = HashSet::new();
@@ -86,31 +94,60 @@ impl Technique for Fish {
                 // Each region has the right number of possibilities
                 // Each cell in a region sees a unique set of cells in each other region
                 // Which means we can perform the union/intersection work
-                let sees = possible_cells
-                    .iter()
-                    .map(|rcells| {
-                        let mut acc =
-                            rcells
-                                .iter()
-                                .copied()
-                                .fold(HashSet::new(), |mut acc, cell| {
-                                    acc.extend(state.sees(cell, symbol));
-                                    acc
-                                });
-                        rcells.iter().for_each(|cell| {
-                            acc.remove(cell);
-                        });
-                        acc
-                    })
-                    .reduce(|acc, elem| acc.intersection(&elem).copied().collect())
-                    .expect("No region cells?");
+                // let sees = possible_cells
+                //     .iter()
+                //     .map(|rcells| {
+                //         let mut acc =
+                //             rcells
+                //                 .iter()
+                //                 .copied()
+                //                 .fold(HashSet::new(), |mut acc, cell| {
+                //                     acc.extend(state.sees(cell, symbol));
+                //                     acc
+                //                 });
+                //         rcells.iter().for_each(|cell| {
+                //             acc.remove(cell);
+                //         });
+                //         acc
+                //     })
+                //     .reduce(|acc, elem| acc.intersection(&elem).copied().collect())
+                //     .expect("No region cells?");
                 // sees is now the set of cells seen by all the unions of the input region cells
+
+                let mut sees = HashSet::new();
+                for (rn, fish_cells1) in fish_cells.iter().enumerate() {
+                    for fish_cell1 in fish_cells1.iter().copied() {
+                        let mut this_fish = vec![fish_cell1];
+                        for fish_cells2 in fish_cells
+                            .iter()
+                            .enumerate()
+                            .filter(|&(i, _)| i != rn)
+                            .map(|(_, r)| r)
+                        {
+                            for fish_cell2 in fish_cells2.iter().copied() {
+                                if state.can_see(fish_cell1, symbol, fish_cell2, symbol) {
+                                    this_fish.push(fish_cell2);
+                                }
+                            }
+                        }
+                        // At this point, this_fish is a set of cells we need to intersect the seeing sets for
+                        sees.extend(
+                            this_fish
+                                .into_iter()
+                                .map(|cell| state.sees(cell, symbol).collect::<HashSet<_>>())
+                                .reduce(|acc, other| {
+                                    acc.intersection(&other).copied().collect::<HashSet<_>>()
+                                })
+                                .expect("We should have some fish"),
+                        );
+                    }
+                }
 
                 let mut action = LogicalStep::action(format!("{} on ", fish_name(self.size)));
                 action.push_symbols(Some(state.symbol(symbol)));
                 action.push_str(" at ");
-                action.push_cells(possible_cells[0].iter().map(|c| state.cell_info(*c)));
-                for possible_cells2 in possible_cells[1..].iter() {
+                action.push_cells(fish_cells[0].iter().map(|c| state.cell_info(*c)));
+                for possible_cells2 in fish_cells[1..].iter() {
                     action.push_str(" and ");
                     action.push_cells(possible_cells2.iter().map(|c| state.cell_info(*c)));
                 }
