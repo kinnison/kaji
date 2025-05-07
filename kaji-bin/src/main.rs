@@ -13,7 +13,7 @@ fn load_sample(leaf: &str) -> String {
 fn main() {
     let mut builder = PuzzleBuilder::default();
 
-    let raw = RawPuzzleData::load(load_sample("xwing3.json")).unwrap();
+    let raw = RawPuzzleData::load(load_sample("swordfish1.json")).unwrap();
 
     SudokuGrid::new(&raw).apply(&mut builder);
     builder.add_constraint(GivenDigits::new(&raw));
