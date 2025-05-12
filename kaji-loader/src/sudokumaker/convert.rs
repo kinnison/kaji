@@ -4,10 +4,10 @@ use kaji_rules::puzzledata::{
     GridData, GridDataKind, PuzzleData, SudokuGridData, SymbolData, SymbolSetData,
 };
 
-use super::RawPuzzleData;
+use super::RawSudokuMakerData;
 
-impl From<RawPuzzleData> for PuzzleData {
-    fn from(val: RawPuzzleData) -> Self {
+impl From<RawSudokuMakerData> for PuzzleData {
+    fn from(val: RawSudokuMakerData) -> Self {
         let size = val.cells.len();
         let mut puzzle = Self::default();
         let mut digits = SymbolSetData::new("digits");

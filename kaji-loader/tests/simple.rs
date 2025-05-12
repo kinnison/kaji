@@ -11,5 +11,5 @@ fn load_sample(leaf: &str) -> String {
 #[test]
 fn load_puzzle1() {
     let puzzle1 = load_sample("puzzle1.json");
-    let _data = RawPuzzleData::load(&puzzle1).unwrap();
+    let _data = RawSudokuMakerData::load(&puzzle1).unwrap();
 }
