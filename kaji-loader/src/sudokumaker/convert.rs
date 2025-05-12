@@ -4,7 +4,7 @@ use kaji_rules::puzzledata::{
     GridData, GridDataKind, PuzzleData, SudokuGridData, SymbolData, SymbolSetData,
 };
 
-use crate::raw::RawPuzzleData;
+use super::RawPuzzleData;
 
 impl From<RawPuzzleData> for PuzzleData {
     fn from(val: RawPuzzleData) -> Self {

@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use kaji_loader::raw::*;
+use kaji_loader::sudokumaker::*;
 
 fn load_sample(leaf: &str) -> String {
     let ctoml = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
