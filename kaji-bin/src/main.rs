@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use kaji::PuzzleBuilder;
-use kaji_loader::sudokumaker::RawPuzzleData;
+use kaji_loader::{fpuzzles::FpuzzlesData, sudokumaker::RawSudokuMakerData};
 use kaji_rules::puzzledata::{GridDataKind, PuzzleData};
 
 fn load_sample(leaf: &str) -> String {
@@ -13,7 +13,8 @@ fn load_sample(leaf: &str) -> String {
 fn main() {
     let mut builder = PuzzleBuilder::default();
 
-    let raw = RawPuzzleData::load(load_sample("antiknight1.json")).unwrap();
+    //let raw = RawSudokuMakerData::load(load_sample("antiknight1.json")).unwrap();
+    let raw = FpuzzlesData::load(load_sample("piggly-wiggly.json")).unwrap();
 
     let puzzledata = PuzzleData::from(raw);
 

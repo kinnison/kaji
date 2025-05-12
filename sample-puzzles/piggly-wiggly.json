@@ -1,0 +1,349 @@
+{
+  "size": 6,
+  "title": "Piggly Wiggly",
+  "author": "Kinnison",
+  "ruleset": "Normal Irregular 6x6 Sudoku rules apply.\n\n(ie. place the digits 1-6 in every row, column, and irregularly shaped region)",
+  "grid": [
+    [
+      {
+        "candidates": [
+          3,
+          4,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "candidates": [
+          2
+        ],
+        "value": 2,
+        "given": true
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "region": 2
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2,
+          4,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5
+        ],
+        "region": 1
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          3
+        ],
+        "region": 2,
+        "value": 3,
+        "given": true
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2,
+          3,
+          4,
+          6
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          1
+        ],
+        "region": 0,
+        "value": 1,
+        "given": true
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          5
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "region": 1
+      },
+      {
+        "candidates": [
+          2,
+          5,
+          6
+        ],
+        "region": 2
+      },
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ],
+        "region": 2
+      }
+    ],
+    [
+      {
+        "candidates": [
+          5
+        ],
+        "region": 3,
+        "value": 5,
+        "given": true
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          6
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          6
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          6
+        ],
+        "region": 2
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "region": 2
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          6
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          6
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          5,
+          6
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          4
+        ],
+        "region": 4,
+        "value": 4,
+        "given": true
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          5
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "region": 5
+      },
+      {
+        "candidates": [
+          6
+        ],
+        "region": 5,
+        "value": 6,
+        "given": true
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          5
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5
+        ]
+      }
+    ]
+  ],
+  "solution": [
+    3,
+    5,
+    4,
+    2,
+    6,
+    1,
+    6,
+    2,
+    5,
+    4,
+    1,
+    3,
+    4,
+    1,
+    2,
+    3,
+    5,
+    6,
+    5,
+    3,
+    1,
+    6,
+    2,
+    4,
+    1,
+    6,
+    3,
+    5,
+    4,
+    2,
+    2,
+    4,
+    6,
+    1,
+    3,
+    5
+  ]
+}
