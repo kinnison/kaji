@@ -1,8 +1,6 @@
 //! This Rule implements things like antiknight, antiking etc.
 //!
 
-use std::collections::HashMap;
-
 use itertools::Itertools;
 use kaji::{CellIndex, PuzzleBuilder, Rule, SymbolSetId};
 

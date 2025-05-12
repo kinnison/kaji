@@ -159,6 +159,14 @@ impl PuzzleBuilder {
         ret
     }
 
+    pub fn symbol_set(&self, symbols: &str) -> Option<SymbolSetId> {
+        self.symbols
+            .iter()
+            .enumerate()
+            .find(|x| x.1.name() == symbols)
+            .map(|x| SymbolSetId(x.0))
+    }
+
     pub fn symbols(&self, set: SymbolSetId) -> impl Iterator<Item = SymbolId> {
         self.symbols[set.0].to_ids(set.0)
     }

@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
-use kaji::{PuzzleBuilder, Rule};
+use kaji::PuzzleBuilder;
 use kaji_loader::raw::RawPuzzleData;
-use kaji_rules::{constraints::GivenDigits, rules::sudoku::SudokuGrid};
+use kaji_rules::puzzledata::{GridDataKind, PuzzleData};
 
 fn load_sample(leaf: &str) -> String {
     let ctoml = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -15,8 +15,11 @@ fn main() {
 
     let raw = RawPuzzleData::load(load_sample("antiknight1.json")).unwrap();
 
-    SudokuGrid::new(&raw).apply(&mut builder);
-    builder.add_constraint(GivenDigits::new(&raw));
+    let puzzledata = PuzzleData::from(raw);
+
+    println!("{puzzledata:#?}");
+
+    puzzledata.build(&mut builder);
 
     let puzzle = builder.build();
 
@@ -25,8 +28,12 @@ fn main() {
 
     if board.solved() {
         let solution = puzzle.solution(&board);
-        if let Some(real_solution) = &raw.metadata.solution {
-            if real_solution == &solution {
+        #[allow(clippy::infallible_destructuring_match)]
+        let raw_board = match puzzledata.grids()[0].kind() {
+            GridDataKind::Sudoku(grid) => grid,
+        };
+        if let Some(real_solution) = raw_board.solution_() {
+            if real_solution == solution {
                 println!("Solutions match");
             } else {
                 println!("Solutions do not match!");

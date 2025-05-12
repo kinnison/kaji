@@ -1,27 +1,22 @@
-use kaji::{consts::SYMBOL_SET_DIGITS, Constraint, SolveState};
-use kaji_loader::raw::RawPuzzleData;
+use kaji::{Constraint, SolveState, SymbolSetId};
+
+use crate::puzzledata::SudokuGridData;
 
 #[derive(Debug)]
 pub struct GivenDigits {
+    symbols: SymbolSetId,
     digits: Vec<(usize, usize, usize)>,
 }
 
 impl GivenDigits {
-    pub fn new(raw: &RawPuzzleData) -> Self {
-        let mut givens = vec![];
-        for (rrow, row) in raw.cells.iter().enumerate() {
-            for (rcol, cell) in row.iter().enumerate() {
-                if let Some(value) = cell.value {
-                    givens.push((rrow + 1, rcol + 1, value));
-                }
-            }
-        }
+    pub fn new(symbols: SymbolSetId, raw: &SudokuGridData) -> Self {
         Self {
-            digits: givens.to_vec(),
+            symbols,
+            digits: raw.givens().to_vec(),
         }
     }
 
-    pub fn from_pattern(pattern: &[&str]) -> Self {
+    pub fn from_pattern(symbols: SymbolSetId, pattern: &[&str]) -> Self {
         let mut digits = vec![];
         for (rownr, row) in pattern.iter().enumerate() {
             for (colnr, digitch) in row.chars().enumerate() {
@@ -30,15 +25,13 @@ impl GivenDigits {
                 }
             }
         }
-        Self { digits }
+        Self { symbols, digits }
     }
 }
 
 impl Constraint for GivenDigits {
     fn prep_board(&self, state: &mut SolveState) {
-        let digits = state
-            .symbols_by_set_name(SYMBOL_SET_DIGITS)
-            .collect::<Vec<_>>();
+        let digits = state.symbols(self.symbols).collect::<Vec<_>>();
         for &(row, col, digit) in &self.digits {
             if let Some(cell) = state.cell_at(row, col) {
                 assert!(digit > 0);

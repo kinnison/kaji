@@ -41,6 +41,7 @@ name = "kaji-loader"
 version = "0.1.0"
 dependencies = [
  "kaji",
+ "kaji-rules",
  "serde",
  "serde_json",
 ]
@@ -51,7 +52,6 @@ version = "0.1.0"
 dependencies = [
  "itertools",
  "kaji",
- "kaji-loader",
 ]
 
 [[package]]

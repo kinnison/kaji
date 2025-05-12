@@ -1,44 +1,49 @@
 //! Sudoku grids
 
-use kaji::{consts::SYMBOL_SET_DIGITS, CellInfo, PuzzleBuilder, Region, Rule, Symbol};
-use kaji_loader::raw::{RawPuzzleData, RawRowColPair};
+use kaji::{CellInfo, PuzzleBuilder, Region, Rule, SymbolSetId};
 
-use crate::techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol};
+use crate::{
+    constraints::GivenDigits,
+    puzzledata::SudokuGridData,
+    techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol},
+};
 
 use super::{antioffset::AntiOffset, regions::NonRepeatRegion};
 
-pub struct SudokuGrid {
-    size: usize,
-    regions: Vec<Vec<RawRowColPair>>,
-    antiknight: bool,
-    antiking: bool,
+pub struct SudokuGrid<'grid> {
+    digits: SymbolSetId,
+    rofs: usize,
+    cofs: usize,
+    raw: &'grid SudokuGridData,
 }
 
-impl SudokuGrid {
-    pub fn new(raw: &RawPuzzleData) -> Self {
-        let size = raw.cells.len();
+impl<'grid> SudokuGrid<'grid> {
+    pub fn new(digits: SymbolSetId, rofs: usize, cofs: usize, raw: &'grid SudokuGridData) -> Self {
+        let size = raw.size();
         assert!([4, 6, 8, 9].contains(&size));
         Self {
-            size,
-            regions: raw.regions.clone(),
-            antiknight: raw.metadata.antiknight,
-            antiking: raw.metadata.antiking,
+            digits,
+            rofs,
+            cofs,
+            raw,
         }
     }
 }
 
-impl Rule for SudokuGrid {
+impl Rule for SudokuGrid<'_> {
     fn apply(&self, builder: &mut PuzzleBuilder) {
-        let mut set = builder.new_symbol_set(SYMBOL_SET_DIGITS);
-        (1..=self.size).for_each(|n| set.push(Symbol::new(format!("{n}"))));
-        let digits = set.finish();
+        let raw = self.raw;
         let mut cells = vec![];
-        let mut rows = vec![vec![]; self.size];
-        let mut cols = vec![vec![]; self.size];
+        let mut rows = vec![vec![]; raw.size()];
+        let mut cols = vec![vec![]; raw.size()];
 
-        (1..=self.size).for_each(|row| {
-            (1..=self.size).for_each(|col| {
-                let rc = builder.new_cell(CellInfo::new(format!("r{row}c{col}"), row, col));
+        (1..=raw.size()).for_each(|row| {
+            (1..=raw.size()).for_each(|col| {
+                let rc = builder.new_cell(CellInfo::new(
+                    format!("r{row}c{col}"),
+                    row + self.rofs,
+                    col + self.cofs,
+                ));
                 rows[row - 1].push(rc);
                 cols[col - 1].push(rc);
                 cells.push(rc);
@@ -59,40 +64,46 @@ impl Rule for SudokuGrid {
             .map(|(n, col)| builder.add_region(Region::new(format!("Column {}", n + 1), col)))
             .collect::<Vec<_>>();
 
-        let mut boxes = vec![];
+        let mut boxes = vec![vec![]; raw.size()];
 
-        for (rrno, rawregion) in self.regions.iter().enumerate() {
-            let boxname = format!("Box {}", rrno + 1);
-            let boxcells = rawregion
-                .iter()
-                .copied()
-                .map(|RawRowColPair(rrow, rcol)| rows[rrow][rcol]);
-            boxes.push(builder.add_region(Region::new(boxname, boxcells)));
+        for (cellidx, rawregion) in raw.regions().iter().copied().enumerate() {
+            boxes[rawregion - 1].push(cells[cellidx]);
         }
+
+        let boxes = boxes
+            .into_iter()
+            .enumerate()
+            .map(|(boxn, boxcells)| {
+                let boxname = format!("Box {}", boxn + 1);
+                builder.add_region(Region::new(boxname, boxcells))
+            })
+            .collect::<Vec<_>>();
 
         for region in region_rows
             .into_iter()
             .chain(cols.into_iter())
             .chain(boxes.into_iter())
         {
-            NonRepeatRegion::new(region, digits).apply(builder);
+            NonRepeatRegion::new(region, self.digits).apply(builder);
         }
 
-        if self.antiking {
-            AntiOffset::new(1, 1, digits, cells.clone()).apply(builder);
+        if raw.rules().antiking {
+            AntiOffset::new(1, 1, self.digits, cells.clone()).apply(builder);
         }
-        if self.antiknight {
-            AntiOffset::new(1, 2, digits, cells.clone()).apply(builder);
+        if raw.rules().antiknight {
+            AntiOffset::new(1, 2, self.digits, cells.clone()).apply(builder);
         }
 
-        builder.add_technique(NakedSingle::new(digits));
-        builder.add_technique(HiddenSingle::new(digits));
-        builder.add_technique(NakedTuple::new(digits, 3));
-        builder.add_technique(HiddenTuple::new(digits, 3));
-        builder.add_technique(PointingSymbol::new(digits));
-        builder.add_technique(NakedTuple::new(digits, self.size - 1));
-        builder.add_technique(HiddenTuple::new(digits, self.size - 1));
-        builder.add_technique(Fish::new(2, digits));
-        builder.add_technique(Fish::new(3, digits));
+        builder.add_constraint(GivenDigits::new(self.digits, raw));
+
+        builder.add_technique(NakedSingle::new(self.digits));
+        builder.add_technique(HiddenSingle::new(self.digits));
+        builder.add_technique(NakedTuple::new(self.digits, 3));
+        builder.add_technique(HiddenTuple::new(self.digits, 3));
+        builder.add_technique(PointingSymbol::new(self.digits));
+        builder.add_technique(NakedTuple::new(self.digits, raw.size() - 1));
+        builder.add_technique(HiddenTuple::new(self.digits, raw.size() - 1));
+        builder.add_technique(Fish::new(2, self.digits));
+        builder.add_technique(Fish::new(3, self.digits));
     }
 }

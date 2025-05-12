@@ -6,4 +6,3 @@ edition = "2021"
 [dependencies]
 itertools = "0.14.0"
 kaji = { path = "../kaji" }
-kaji-loader = { path = "../kaji-loader" }
