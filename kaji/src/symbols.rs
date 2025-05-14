@@ -178,6 +178,10 @@ impl RawSymbolChoice {
     const VALUE_MASK: u32 = (1 << 31) - 1;
     const SOLVED_MASK: u32 = (1 << 31);
 
+    pub(crate) fn new_unsolved_single(symbol: usize) -> Self {
+        assert!(symbol < 32);
+        Self(1 << symbol)
+    }
     pub(crate) fn any(size: usize) -> Self {
         assert!(size < 32);
         Self((1 << size) - 1)
