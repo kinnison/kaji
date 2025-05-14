@@ -50,6 +50,15 @@ pub struct SudokuGridData {
 pub struct SudokuGridRulesData {
     pub antiknight: bool,
     pub antiking: bool,
+    pub quadruple: Vec<SudokuGridRuleQuadrupleData>,
+}
+
+#[derive(Debug)]
+pub struct SudokuGridRuleQuadrupleData {
+    /// (row,col) 1 based
+    pub cells: Vec<(usize, usize)>,
+    /// (symbol index, 1 based)
+    pub symbols: Vec<usize>,
 }
 
 impl PuzzleData {
