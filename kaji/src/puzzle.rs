@@ -9,13 +9,27 @@ use std::ops::{BitAnd, BitOr};
 /// A representation of a puzzle which may be solved
 pub struct Puzzle {
     symbols: Vec<RawSymbolSet>,
-    constraints: Vec<Box<dyn Constraint>>,
-    techniques: Vec<Box<dyn Technique>>,
+    logical_actions: Vec<LogicalAction>,
     cells: Vec<CellInfo>,
     cell_regions: Vec<Vec<RegionId>>,
     regions: Vec<Region>,
     implications: HashMap<(CellIndex, SymbolId), Vec<(CellIndex, SymbolId)>>,
     rowcols: HashMap<(usize, usize), CellIndex>,
+}
+
+#[derive(Debug)]
+enum LogicalAction {
+    Constraint(Box<dyn Constraint>),
+    Technique(Box<dyn Technique>),
+}
+
+impl LogicalAction {
+    fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
+        match self {
+            Self::Constraint(c) => c.logical_step(state),
+            Self::Technique(t) => t.logical_step(state),
+        }
+    }
 }
 
 #[derive(Debug, Default)]
@@ -210,8 +224,8 @@ impl PuzzleBuilder {
     pub fn build(self) -> Puzzle {
         let Self {
             symbols,
-            constraints,
-            techniques,
+            mut constraints,
+            mut techniques,
             cells,
             cell_regions,
             regions,
@@ -219,10 +233,38 @@ impl PuzzleBuilder {
             implications,
         } = self;
 
+        constraints.sort_unstable_by_key(|v| v.difficulty());
+        techniques.sort_unstable_by_key(|v| v.difficulty());
+
+        let mut constraints = constraints.into_iter().peekable();
+        let mut techniques = techniques.into_iter().peekable();
+
+        let mut logical_actions = vec![];
+        loop {
+            let next_con = constraints.peek();
+            let next_tech = techniques.peek();
+            match (next_con, next_tech) {
+                (Some(con), Some(tech)) => {
+                    if con.difficulty() < tech.difficulty() {
+                        logical_actions
+                            .push(LogicalAction::Constraint(constraints.next().unwrap()));
+                    } else {
+                        logical_actions.push(LogicalAction::Technique(techniques.next().unwrap()));
+                    }
+                }
+                (Some(_), None) => {
+                    logical_actions.push(LogicalAction::Constraint(constraints.next().unwrap()));
+                }
+                (None, Some(_)) => {
+                    logical_actions.push(LogicalAction::Technique(techniques.next().unwrap()));
+                }
+                (None, None) => break,
+            }
+        }
+
         Puzzle {
             symbols,
-            constraints,
-            techniques,
+            logical_actions,
             cells,
             cell_regions,
             regions,
@@ -281,8 +323,10 @@ impl Puzzle {
 
     fn initial_board(&self) -> SolveState {
         let mut state = SolveState::new(self, Board::empty(self.cells.len(), &self.symbols));
-        for constraint in &self.constraints {
-            constraint.prep_board(&mut state);
+        for action in &self.logical_actions {
+            if let LogicalAction::Constraint(constraint) = action {
+                constraint.prep_board(&mut state);
+            }
         }
         state
     }
@@ -351,10 +395,6 @@ impl Puzzle {
         }
 
         ret
-    }
-
-    pub fn add_constraint<C: Constraint + 'static>(&mut self, constraint: C) {
-        self.constraints.push(Box::new(constraint));
     }
 
     fn symbol_set(&self, idx: SymbolSetId) -> &RawSymbolSet {
@@ -445,17 +485,9 @@ impl Puzzle {
 
     fn logical_step(&self, board: &mut SolveState) -> LogicalStep {
         let mut finished = true;
-        for constraint in &self.constraints {
-            match constraint.logical_step(board) {
-                LogicalStep::NoAction => {
-                    finished = false;
-                }
-                LogicalStep::Finished => {}
-                ls => return ls,
-            }
-        }
-        for technique in &self.techniques {
-            match technique.logical_step(board) {
+
+        for action in &self.logical_actions {
+            match action.logical_step(board) {
                 LogicalStep::NoAction => {
                     finished = false;
                 }

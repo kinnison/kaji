@@ -1,6 +1,9 @@
 use std::collections::HashSet;
 
-use kaji::{LogicalStep, SolveState, SymbolSetId, Technique};
+use kaji::{
+    consts::{DIFFICULTY_EASY, DIFFICULTY_FIENDISH, DIFFICULTY_MEDIUM, DIFFICULTY_TRIVIAL},
+    LogicalStep, SolveState, SymbolSetId, Technique,
+};
 
 use itertools::Itertools;
 
@@ -66,6 +69,14 @@ impl Technique for NakedTuple {
             }
         }
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        match self.max_n {
+            0..=2 => DIFFICULTY_TRIVIAL,
+            3..=4 => DIFFICULTY_MEDIUM,
+            5.. => DIFFICULTY_FIENDISH,
+        }
     }
 }
 
@@ -135,5 +146,13 @@ impl Technique for HiddenTuple {
             }
         }
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        match self.max_n {
+            0..=2 => DIFFICULTY_EASY,
+            3..=4 => DIFFICULTY_MEDIUM + 100,
+            5.. => DIFFICULTY_FIENDISH + 100,
+        }
     }
 }

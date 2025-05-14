@@ -7,6 +7,12 @@ use crate::{puzzle::SolveState, CellInfo, Symbol};
 /// and apply their limitations at the start of solving, and whenever
 /// the board changes in areas they are interested in.
 pub trait Constraint: std::fmt::Debug {
+    /// How hard is this constraint to make logical deductions with?
+    ///
+    /// You may use the constants from the [`kaji`][crate] crate,
+    /// for example [`DIFFICULTY_EASY`][crate::consts::DIFFICULTY_EASY]
+    fn difficulty(&self) -> u16;
+
     /// Prepare a board ready for "playing".
     ///
     /// This is called exactly once and is used to apply

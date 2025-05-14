@@ -1,4 +1,6 @@
-use kaji::{CellIndex, LogicalStep, SolveState, SymbolSetId, Technique};
+use kaji::{
+    consts::DIFFICULTY_TRIVIAL, CellIndex, LogicalStep, SolveState, SymbolSetId, Technique,
+};
 
 #[derive(Debug)]
 pub struct NakedSingle {
@@ -27,6 +29,10 @@ impl Technique for NakedSingle {
         }
 
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        DIFFICULTY_TRIVIAL
     }
 }
 
@@ -81,5 +87,9 @@ impl Technique for HiddenSingle {
         }
 
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        DIFFICULTY_TRIVIAL + 10
     }
 }

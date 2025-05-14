@@ -2,7 +2,7 @@
 
 use std::collections::HashSet;
 
-use kaji::{LogicalStep, RegionId, SolveState, SymbolSetId, Technique};
+use kaji::{consts::DIFFICULTY_EASY, LogicalStep, RegionId, SolveState, SymbolSetId, Technique};
 
 #[derive(Debug)]
 pub struct PointingSymbol {
@@ -63,5 +63,9 @@ impl Technique for PointingSymbol {
         }
 
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        DIFFICULTY_EASY
     }
 }

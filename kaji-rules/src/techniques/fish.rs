@@ -1,7 +1,10 @@
 use std::collections::HashSet;
 
 use itertools::Itertools;
-use kaji::{LogicalStep, SolveState, SymbolSetId, Technique};
+use kaji::{
+    consts::{DIFFICULTY_FIENDISH, DIFFICULTY_HARD},
+    LogicalStep, SolveState, SymbolSetId, Technique,
+};
 
 #[derive(Debug)]
 pub struct Fish {
@@ -168,5 +171,13 @@ impl Technique for Fish {
         }
 
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        match self.size {
+            ..=2 => DIFFICULTY_HARD,
+            3..=4 => DIFFICULTY_FIENDISH,
+            5.. => unreachable!(),
+        }
     }
 }

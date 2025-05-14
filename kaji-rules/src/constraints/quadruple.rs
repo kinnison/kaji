@@ -4,7 +4,10 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-use kaji::{CellIndex, Constraint, LogicalStep, SolveState, SymbolChoice, SymbolId, SymbolSetId};
+use kaji::{
+    consts::DIFFICULTY_MEDIUM, CellIndex, Constraint, LogicalStep, SolveState, SymbolChoice,
+    SymbolId, SymbolSetId,
+};
 
 #[derive(Debug)]
 pub struct Quadruple {
@@ -152,5 +155,9 @@ impl Constraint for Quadruple {
         }
 
         LogicalStep::NoAction
+    }
+
+    fn difficulty(&self) -> u16 {
+        DIFFICULTY_MEDIUM
     }
 }

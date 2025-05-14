@@ -10,6 +10,12 @@ use crate::{LogicalStep, SolveState};
 /// may be as simple as "This cell can only be X, so it's X"
 /// for as complex as chaining inferences through multiple steps.
 pub trait Technique: std::fmt::Debug {
+    /// How hard is this constraint to make logical deductions with?
+    ///
+    /// You may use the constants from the [`kaji`][crate] crate,
+    /// for example [`DIFFICULTY_EASY`][crate::consts::DIFFICULTY_EASY]
+    fn difficulty(&self) -> u16;
+
     /// Execute a single logical action on the board.
     ///
     /// If the constraint has no logical steps that it can make,

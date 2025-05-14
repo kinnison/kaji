@@ -40,4 +40,8 @@ impl Constraint for GivenDigits {
             }
         }
     }
+
+    fn difficulty(&self) -> u16 {
+        0 // We don't do logical steps, so no difficulty
+    }
 }
