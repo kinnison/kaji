@@ -1,7 +1,8 @@
 use std::num::NonZeroUsize;
 
 use kaji_rules::puzzledata::{
-    GridData, GridDataKind, PuzzleData, SudokuGridData, SymbolData, SymbolSetData,
+    GridData, GridDataKind, PuzzleData, SudokuGridData, SudokuGridRuleQuadrupleData, SymbolData,
+    SymbolSetData,
 };
 
 use super::FpuzzlesData;
@@ -48,6 +49,16 @@ impl From<FpuzzlesData> for PuzzleData {
                 .collect::<String>();
             grid.set_solution_(&solution);
         }
+
+        grid.rules_mut().quadruple = val
+            .quadruple
+            .into_iter()
+            .map(|fpquad| {
+                let cells = fpquad.cells.into_iter().map(|c| (c.row, c.col)).collect();
+                let symbols = fpquad.values.into_iter().map(|v| v.get()).collect();
+                SudokuGridRuleQuadrupleData { cells, symbols }
+            })
+            .collect();
 
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 

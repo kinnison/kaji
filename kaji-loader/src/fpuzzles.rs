@@ -3,7 +3,7 @@
 
 use std::num::NonZeroUsize;
 
-use serde::Deserialize;
+use serde::{de::Visitor, Deserialize};
 use serde_json::Result;
 
 mod convert;
@@ -22,12 +22,75 @@ pub struct FpuzzlesData {
     pub antiking: bool,
     #[serde(default)]
     pub antiknight: bool,
+    #[serde(default)]
+    pub quadruple: Vec<FpuzzlesQuadruple>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct FpuzzlesCellData {
     pub value: Option<NonZeroUsize>,
     pub region: Option<usize>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FpuzzlesQuadruple {
+    pub cells: Vec<FpuzzlesCellRef>,
+    pub values: Vec<NonZeroUsize>,
+}
+
+#[derive(Debug)]
+pub struct FpuzzlesCellRef {
+    pub row: usize,
+    pub col: usize,
+}
+
+impl<'de> Deserialize<'de> for FpuzzlesCellRef {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct FpuzzlesCellRefVisitor;
+        impl<'de> Visitor<'de> for FpuzzlesCellRefVisitor {
+            type Value = FpuzzlesCellRef;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a string of the form RNCN")
+            }
+
+            fn visit_borrowed_str<E>(self, v: &'de str) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                // v is of the form RnCn where n may be 1 or more digits
+                let first = v
+                    .chars()
+                    .next()
+                    .ok_or(serde::de::Error::custom("empty cell refs not permitted"))?;
+
+                if !first.eq_ignore_ascii_case(&'r') {
+                    return Err(serde::de::Error::custom(
+                        "cell ref must be of the form rncn",
+                    ));
+                }
+                let v = v.to_ascii_lowercase();
+                if let Some((row, col)) = v[1..].split_once('c') {
+                    let row = row.parse().map_err(|e| {
+                        serde::de::Error::custom(format!("Failure parsing {row}: {e}"))
+                    })?;
+                    let col = col.parse().map_err(|e| {
+                        serde::de::Error::custom(format!("Failure parsing {col}: {e}"))
+                    })?;
+                    Ok(FpuzzlesCellRef { row, col })
+                } else {
+                    Err(serde::de::Error::custom(
+                        "cell ref must be of the form rncn",
+                    ))
+                }
+            }
+        }
+
+        deserializer.deserialize_str(FpuzzlesCellRefVisitor)
+    }
 }
 
 impl FpuzzlesData {
