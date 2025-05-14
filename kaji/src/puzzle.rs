@@ -445,6 +445,15 @@ impl Puzzle {
 
     fn logical_step(&self, board: &mut SolveState) -> LogicalStep {
         let mut finished = true;
+        for constraint in &self.constraints {
+            match constraint.logical_step(board) {
+                LogicalStep::NoAction => {
+                    finished = false;
+                }
+                LogicalStep::Finished => {}
+                ls => return ls,
+            }
+        }
         for technique in &self.techniques {
             match technique.logical_step(board) {
                 LogicalStep::NoAction => {

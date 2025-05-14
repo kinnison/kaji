@@ -17,10 +17,22 @@ pub trait Constraint: std::fmt::Debug {
     /// omitted.  However if omitted, the constraint must provide
     /// a logical step
     fn prep_board(&self, _state: &mut SolveState);
+
+    /// Make a logical step (like [`Technique`][crate::Technique])
+    ///
+    /// Like a technique, this permits constraints to perform logical
+    /// steps.  Constraint steps happen before trying the main techniques
+    /// so it's likely to not be able to work every time.
+    ///
+    /// If you do not need to do this,  you do not need to implement
+    /// this function, the default is to take no action.
+    fn logical_step(&self, _state: &mut SolveState) -> LogicalStep {
+        LogicalStep::NoAction
+    }
 }
 
 /// The result of running a logical step in our solver
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub enum LogicalStep {
     /// During this step in the solve, something happened
     Acted(String),
