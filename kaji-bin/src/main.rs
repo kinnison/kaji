@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use kaji::PuzzleBuilder;
-use kaji_loader::{fpuzzles::FpuzzlesData, sudokumaker::RawSudokuMakerData};
+use kaji_loader::fpuzzles::FpuzzlesData;
 use kaji_rules::puzzledata::{GridDataKind, PuzzleData};
 
 fn load_sample(leaf: &str) -> String {
