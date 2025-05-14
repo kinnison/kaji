@@ -115,6 +115,19 @@ impl Effect {
     }
 }
 
+impl SymbolId {
+    pub fn symbol_set(&self) -> SymbolSetId {
+        SymbolSetId(self.set_index())
+    }
+
+    pub fn to_choice(&self) -> SymbolChoice {
+        SymbolChoice {
+            set: self.symbol_set(),
+            choice: RawSymbolChoice::new_unsolved_single(self.symbol_index()),
+        }
+    }
+}
+
 impl PuzzleBuilder {
     pub fn new_symbol_set(&mut self, name: &str) -> SymbolSetBuilder {
         SymbolSetBuilder::new(self, name)
