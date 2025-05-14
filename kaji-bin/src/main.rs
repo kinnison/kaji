@@ -14,7 +14,7 @@ fn main() {
     let mut builder = PuzzleBuilder::default();
 
     //let raw = RawSudokuMakerData::load(load_sample("antiknight1.json")).unwrap();
-    let raw = FpuzzlesData::load(load_sample("piggly-wiggly.json")).unwrap();
+    let raw = FpuzzlesData::load(load_sample("quad-bike.json")).unwrap();
 
     let puzzledata = PuzzleData::from(raw);
 
