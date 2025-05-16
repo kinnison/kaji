@@ -1,5 +1,6 @@
 use std::num::NonZeroUsize;
 
+use kaji::SymbolValue;
 use kaji_rules::puzzledata::{
     GridData, GridDataKind, PuzzleData, SudokuGridData, SymbolData, SymbolSetData,
 };
@@ -13,7 +14,7 @@ impl From<RawSudokuMakerData> for PuzzleData {
         let mut digits = SymbolSetData::new("digits");
 
         for n in 1..=size {
-            digits.push(SymbolData::new(format!("{n}")));
+            digits.push(SymbolData::new(format!("{n}"), SymbolValue::Set(n as i32)));
         }
 
         puzzle.push_symbols(digits);

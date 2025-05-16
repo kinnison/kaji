@@ -3,7 +3,7 @@
 
 use std::num::NonZeroUsize;
 
-use kaji::{PuzzleBuilder, Rule, Symbol};
+use kaji::{PuzzleBuilder, Rule, Symbol, SymbolValue};
 
 use crate::rules::sudoku::SudokuGrid;
 
@@ -22,6 +22,7 @@ pub struct SymbolSetData {
 #[derive(Debug)]
 pub struct SymbolData {
     display: String,
+    value: SymbolValue,
 }
 
 #[derive(Debug)]
@@ -103,7 +104,7 @@ impl PuzzleData {
         for set in self.symbols() {
             let mut builder = builder.new_symbol_set(set.name());
             for symbol in set.symbols() {
-                let symbol = Symbol::new(symbol.display());
+                let symbol = Symbol::new(symbol.display(), symbol.value());
                 builder.push(symbol);
             }
             builder.finish();
@@ -137,13 +138,17 @@ impl SymbolSetData {
 }
 
 impl SymbolData {
-    pub fn new(display: impl Into<String>) -> Self {
+    pub fn new(display: impl Into<String>, value: SymbolValue) -> Self {
         let display = display.into();
-        Self { display }
+        Self { display, value }
     }
 
     pub fn display(&self) -> &str {
         &self.display
+    }
+
+    pub fn value(&self) -> SymbolValue {
+        self.value
     }
 }
 

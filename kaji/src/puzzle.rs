@@ -123,6 +123,7 @@ pub enum Effect {
     Changed,
 }
 
+#[derive(Debug)]
 pub struct CellValue {
     symbols: Vec<SymbolId>,
     value: i32,
@@ -140,6 +141,14 @@ impl CellValue {
             symbols: symbols.to_vec(),
             value,
         }
+    }
+
+    pub fn symbols(&self) -> &[SymbolId] {
+        &self.symbols
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
     }
 }
 
@@ -739,6 +748,7 @@ impl<'p> SolveState<'p> {
         if choice_n == choices.len() {
             // We've completed a set of choices, return this value
             ret.push(CellValue::new(symbols, curval));
+            return;
         }
         for opt in choices[choice_n].options() {
             let symbol = SymbolId::new(choice_n, opt);
@@ -761,7 +771,7 @@ impl<'p> SolveState<'p> {
 
         self._cell_values(&mut ret, &mut symbols, &choices, 0, 0);
 
-        vec![].into_iter()
+        ret.into_iter()
     }
 }
 
