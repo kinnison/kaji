@@ -13,7 +13,7 @@ fn load_sample(leaf: &str) -> String {
 fn main() {
     let mut builder = PuzzleBuilder::default();
 
-    let raw = FpuzzlesData::load(load_sample("quad-bike.json")).unwrap();
+    let raw = FpuzzlesData::load(load_sample("joined-up-thinking.json")).unwrap();
 
     let puzzledata = PuzzleData::from(raw);
 
