@@ -56,6 +56,10 @@ pub struct SudokuGridRulesData {
     pub diagonal_n: bool,
     pub disjoint_groups: bool,
     pub clone_pairs: Vec<SudokuGridRuleCloneData>,
+    /// (row,col) 1 based
+    pub odd_cells: Vec<(usize, usize)>,
+    /// (row,col) 1 based    
+    pub even_cells: Vec<(usize, usize)>,
 }
 
 #[derive(Debug)]

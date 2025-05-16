@@ -93,6 +93,18 @@ impl From<FpuzzlesData> for PuzzleData {
             }
         }
 
+        for odd in val.odd {
+            grid.rules_mut()
+                .odd_cells
+                .push((odd.cell.row, odd.cell.col));
+        }
+
+        for even in val.even {
+            grid.rules_mut()
+                .even_cells
+                .push((even.cell.row, even.cell.col));
+        }
+
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 
         puzzle.push_grid(grid);

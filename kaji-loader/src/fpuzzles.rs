@@ -37,6 +37,10 @@ pub struct FpuzzlesData {
     pub clone: Vec<FpuzzlesClones>,
     #[serde(default)]
     pub palindrome: Vec<FpuzzlesLines>,
+    #[serde(default)]
+    pub odd: Vec<FpuzzlesSingleCell>,
+    #[serde(default)]
+    pub even: Vec<FpuzzlesSingleCell>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -67,6 +71,11 @@ pub struct FpuzzlesClones {
 #[derive(Debug, Deserialize)]
 pub struct FpuzzlesLines {
     pub lines: Vec<Vec<FpuzzlesCellRef>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FpuzzlesSingleCell {
+    pub cell: FpuzzlesCellRef,
 }
 
 impl<'de> Deserialize<'de> for FpuzzlesCellRef {
