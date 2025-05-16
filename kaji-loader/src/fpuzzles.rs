@@ -11,8 +11,11 @@ mod convert;
 #[derive(Debug, Deserialize)]
 pub struct FpuzzlesData {
     pub size: usize,
+    #[serde(default)]
     pub title: String,
+    #[serde(default)]
     pub author: String,
+    #[serde(default)]
     pub ruleset: String,
     pub solution: Option<Vec<NonZeroUsize>>,
     pub grid: Vec<Vec<FpuzzlesCellData>>,
