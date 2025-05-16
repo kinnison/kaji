@@ -77,6 +77,21 @@ impl From<FpuzzlesData> for PuzzleData {
             }
         }
 
+        for palindrome in val.palindrome {
+            for line in palindrome.lines {
+                // a,b,c,d,e,f
+                // -> (a,f) (b,e) (c,d)
+                // a,b,c
+                // -> (a,c)
+                for (a, b) in line.iter().zip(line.iter().rev()) {
+                    grid.rules_mut().clone_pairs.push(SudokuGridRuleCloneData {
+                        a: (a.row, a.col),
+                        b: (b.row, b.col),
+                    })
+                }
+            }
+        }
+
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 
         puzzle.push_grid(grid);
