@@ -3,7 +3,7 @@
 use kaji::{CellInfo, PuzzleBuilder, Region, Rule, SymbolSetId};
 
 use crate::{
-    constraints::{GivenDigits, Quadruple},
+    constraints::{CloneCell, GivenDigits, Quadruple},
     puzzledata::SudokuGridData,
     techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol},
 };
@@ -130,6 +130,12 @@ impl Rule for SudokuGrid<'_> {
                 });
                 builder.add_constraint(Quadruple::new(cells, needed));
             }
+        }
+
+        for clone in &raw.rules().clone_pairs {
+            let cell_a = rows[clone.a.0 - 1][clone.a.1 - 1];
+            let cell_b = rows[clone.b.0 - 1][clone.b.1 - 1];
+            builder.add_constraint(CloneCell::new(cell_a, cell_b));
         }
 
         builder.add_technique(NakedSingle::new(self.digits));
