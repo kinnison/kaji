@@ -64,25 +64,48 @@ impl Rule for SudokuGrid<'_> {
             .map(|(n, col)| builder.add_region(Region::new(format!("Column {}", n + 1), col)))
             .collect::<Vec<_>>();
 
-        let mut boxes = vec![vec![]; raw.size()];
+        let mut box_cells = vec![vec![]; raw.size()];
 
         for (cellidx, rawregion) in raw.regions().iter().copied().enumerate() {
-            boxes[rawregion - 1].push(cells[cellidx]);
+            box_cells[rawregion - 1].push(cells[cellidx]);
         }
 
-        let boxes = boxes
-            .into_iter()
+        let boxes = box_cells
+            .iter()
             .enumerate()
             .map(|(boxn, boxcells)| {
                 let boxname = format!("Box {}", boxn + 1);
-                builder.add_region(Region::new(boxname, boxcells))
+                builder.add_region(Region::new(boxname, boxcells.iter().copied()))
             })
             .collect::<Vec<_>>();
+
+        let mut extra_regions = vec![];
+        if raw.rules().diagonal_n {
+            extra_regions.push(builder.add_region(Region::new(
+                "Negative Diagonal",
+                (0..raw.size()).map(|n| rows[n][n]),
+            )))
+        }
+        if raw.rules().diagonal_p {
+            extra_regions.push(builder.add_region(Region::new(
+                "Positive Diagonal",
+                (0..raw.size()).map(|n| rows[raw.size() - n - 1][n]),
+            )))
+        }
+        if raw.rules().disjoint_groups {
+            for bidx in 0..raw.size() {
+                extra_regions.push(builder.add_region(Region::new(
+                    format!("Disjoint group {}", bidx + 1),
+                    box_cells.iter().map(|b| b[bidx]),
+                )));
+            }
+        }
 
         for region in region_rows
             .into_iter()
             .chain(cols.into_iter())
             .chain(boxes.into_iter())
+            .chain(extra_regions.into_iter())
         {
             NonRepeatRegion::new(region, self.digits).apply(builder);
         }

@@ -32,6 +32,9 @@ impl From<FpuzzlesData> for PuzzleData {
         let mut grid = SudokuGridData::new("digits", NonZeroUsize::new(size).unwrap(), regions);
         grid.rules_mut().antiking = val.antiking;
         grid.rules_mut().antiknight = val.antiknight;
+        grid.rules_mut().diagonal_n = val.diagonal_n;
+        grid.rules_mut().diagonal_p = val.diagonal_p;
+        grid.rules_mut().disjoint_groups = val.disjointgroups;
 
         for (rnum, row) in val.grid.into_iter().enumerate() {
             for (cnum, cell) in row.into_iter().enumerate() {

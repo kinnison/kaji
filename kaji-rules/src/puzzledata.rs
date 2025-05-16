@@ -51,6 +51,9 @@ pub struct SudokuGridRulesData {
     pub antiknight: bool,
     pub antiking: bool,
     pub quadruple: Vec<SudokuGridRuleQuadrupleData>,
+    pub diagonal_p: bool,
+    pub diagonal_n: bool,
+    pub disjoint_groups: bool,
 }
 
 #[derive(Debug)]

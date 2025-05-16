@@ -27,6 +27,12 @@ pub struct FpuzzlesData {
     pub antiknight: bool,
     #[serde(default)]
     pub quadruple: Vec<FpuzzlesQuadruple>,
+    #[serde(default, rename = "diagonal+")]
+    pub diagonal_p: bool,
+    #[serde(default, rename = "diagonal-")]
+    pub diagonal_n: bool,
+    #[serde(default)]
+    pub disjointgroups: bool,
 }
 
 #[derive(Debug, Deserialize)]
