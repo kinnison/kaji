@@ -123,9 +123,23 @@ pub enum Effect {
     Changed,
 }
 
+pub struct CellValue {
+    symbols: Vec<SymbolId>,
+    value: i32,
+}
+
 impl Effect {
     pub fn changed(self) -> bool {
         matches!(self, Self::Changed)
+    }
+}
+
+impl CellValue {
+    fn new(symbols: &[SymbolId], value: i32) -> Self {
+        Self {
+            symbols: symbols.to_vec(),
+            value,
+        }
     }
 }
 
@@ -712,6 +726,42 @@ impl<'p> SolveState<'p> {
         symbol2: SymbolId,
     ) -> bool {
         self.puzzle.can_see(cell1, symbol1, cell2, symbol2)
+    }
+
+    fn _cell_values(
+        &self,
+        ret: &mut Vec<CellValue>,
+        symbols: &mut [SymbolId],
+        choices: &[RawSymbolChoice],
+        choice_n: usize,
+        curval: i32,
+    ) {
+        if choice_n == choices.len() {
+            // We've completed a set of choices, return this value
+            ret.push(CellValue::new(symbols, curval));
+        }
+        for opt in choices[choice_n].options() {
+            let symbol = SymbolId::new(choice_n, opt);
+            symbols[choice_n] = symbol;
+
+            self._cell_values(
+                ret,
+                symbols,
+                choices,
+                choice_n + 1,
+                self.symbol(symbol).value().apply(curval),
+            );
+        }
+    }
+
+    pub fn cell_values(&self, cell: CellIndex) -> impl Iterator<Item = CellValue> {
+        let choices = self.board.choices(cell).collect::<Vec<_>>();
+        let mut ret = vec![];
+        let mut symbols = vec![SymbolId::new(0, 0); choices.len()];
+
+        self._cell_values(&mut ret, &mut symbols, &choices, 0, 0);
+
+        vec![].into_iter()
     }
 }
 

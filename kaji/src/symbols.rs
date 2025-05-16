@@ -13,6 +13,14 @@ use crate::{PuzzleBuilder, SymbolSetId};
 #[derive(Debug)]
 pub struct Symbol {
     name: String,
+    value: SymbolValue,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum SymbolValue {
+    Set(i32),
+    Add(i32),
+    Mul(i32),
 }
 
 /// A set of symbols in a sudoku puzzle
@@ -64,6 +72,20 @@ impl Symbol {
     pub(crate) fn width(&self) -> usize {
         self.name.len()
     }
+
+    pub fn value(&self) -> SymbolValue {
+        self.value
+    }
+}
+
+impl SymbolValue {
+    pub fn apply(&self, lhs: i32) -> i32 {
+        match *self {
+            Self::Set(n) => n,
+            Self::Add(n) => lhs + n,
+            Self::Mul(n) => lhs * n,
+        }
+    }
 }
 
 impl RawSymbolSet {
@@ -99,9 +121,10 @@ impl Index<usize> for RawSymbolSet {
 
 impl Symbol {
     /// Create a new symbol with the given name
-    pub fn new(display: impl Into<String>) -> Self {
+    pub fn new(display: impl Into<String>, value: SymbolValue) -> Self {
         Self {
             name: display.into(),
+            value,
         }
     }
 }
@@ -109,18 +132,6 @@ impl Symbol {
 impl Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.name.fmt(f)
-    }
-}
-
-impl From<String> for Symbol {
-    fn from(val: String) -> Self {
-        Symbol::new(val)
-    }
-}
-
-impl From<&str> for Symbol {
-    fn from(val: &str) -> Self {
-        Symbol::new(val)
     }
 }
 
