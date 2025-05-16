@@ -5,8 +5,8 @@ use std::collections::HashMap;
 
 use itertools::Itertools;
 use kaji::{
-    consts::DIFFICULTY_MEDIUM, CellIndex, Constraint, LogicalStep, SolveState, SymbolChoice,
-    SymbolId, SymbolSetId,
+    consts::DIFFICULTY_MEDIUM, CellIndex, Constraint, LogicalStep, SolveState, SymbolId,
+    SymbolSetId,
 };
 
 #[derive(Debug)]
@@ -18,7 +18,6 @@ pub struct Quadruple {
 
 #[derive(Debug)]
 pub struct QuadState {
-    choices: Vec<SymbolChoice>,
     unfilled: Vec<CellIndex>,
     left: Vec<SymbolId>,
 }
@@ -70,11 +69,7 @@ impl Quadruple {
             }
         }
 
-        QuadState {
-            choices,
-            unfilled,
-            left,
-        }
+        QuadState { unfilled, left }
     }
 
     fn prep_action(&self, state: &mut SolveState<'_>) -> LogicalStep {
