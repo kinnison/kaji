@@ -231,13 +231,19 @@ impl BitAnd for RawSymbolChoice {
     type Output = Self;
 
     fn bitand(self, rhs: Self) -> Self::Output {
-        Self(self.0 & rhs.0 & Self::VALUE_MASK)
+        let bits = self.0 & rhs.0 & Self::VALUE_MASK;
+        let solved = if bits.count_ones() == 1 {
+            Self::SOLVED_MASK
+        } else {
+            0
+        };
+        Self(bits | solved)
     }
 }
 
 impl BitAndAssign for RawSymbolChoice {
     fn bitand_assign(&mut self, rhs: Self) {
-        self.0 &= rhs.0 & Self::VALUE_MASK;
+        self.0 = self.0 & rhs.0
     }
 }
 
