@@ -54,6 +54,7 @@ pub struct SudokuGridRulesData {
     pub diagonal_p: bool,
     pub diagonal_n: bool,
     pub disjoint_groups: bool,
+    pub clone_pairs: Vec<SudokuGridRuleCloneData>,
 }
 
 #[derive(Debug)]
@@ -62,6 +63,14 @@ pub struct SudokuGridRuleQuadrupleData {
     pub cells: Vec<(usize, usize)>,
     /// (symbol index, 1 based)
     pub symbols: Vec<usize>,
+}
+
+#[derive(Debug)]
+pub struct SudokuGridRuleCloneData {
+    /// (row,col) 1-based
+    pub a: (usize, usize),
+    /// (row,col) 1-based
+    pub b: (usize, usize),
 }
 
 impl PuzzleData {

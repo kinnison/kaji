@@ -1,8 +1,8 @@
 use std::num::NonZeroUsize;
 
 use kaji_rules::puzzledata::{
-    GridData, GridDataKind, PuzzleData, SudokuGridData, SudokuGridRuleQuadrupleData, SymbolData,
-    SymbolSetData,
+    GridData, GridDataKind, PuzzleData, SudokuGridData, SudokuGridRuleCloneData,
+    SudokuGridRuleQuadrupleData, SymbolData, SymbolSetData,
 };
 
 use super::FpuzzlesData;
@@ -62,6 +62,20 @@ impl From<FpuzzlesData> for PuzzleData {
                 SudokuGridRuleQuadrupleData { cells, symbols }
             })
             .collect();
+
+        for clone_group in val.clone {
+            assert_eq!(clone_group.cells.len(), clone_group.clone_cells.len());
+            for (a, b) in clone_group
+                .cells
+                .into_iter()
+                .zip(clone_group.clone_cells.into_iter())
+            {
+                grid.rules_mut().clone_pairs.push(SudokuGridRuleCloneData {
+                    a: (a.row, a.col),
+                    b: (b.row, b.col),
+                })
+            }
+        }
 
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 

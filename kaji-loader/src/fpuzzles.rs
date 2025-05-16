@@ -33,6 +33,10 @@ pub struct FpuzzlesData {
     pub diagonal_n: bool,
     #[serde(default)]
     pub disjointgroups: bool,
+    #[serde(default)]
+    pub clone: Vec<FpuzzlesClones>,
+    #[serde(default)]
+    pub palindrome: Vec<FpuzzlesLines>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -51,6 +55,18 @@ pub struct FpuzzlesQuadruple {
 pub struct FpuzzlesCellRef {
     pub row: usize,
     pub col: usize,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FpuzzlesClones {
+    pub cells: Vec<FpuzzlesCellRef>,
+    #[serde(rename = "cloneCells")]
+    pub clone_cells: Vec<FpuzzlesCellRef>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FpuzzlesLines {
+    pub lines: Vec<Vec<FpuzzlesCellRef>>,
 }
 
 impl<'de> Deserialize<'de> for FpuzzlesCellRef {
