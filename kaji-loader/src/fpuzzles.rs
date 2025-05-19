@@ -45,6 +45,10 @@ pub struct FpuzzlesData {
     pub nonconsecutive: bool,
     #[serde(default)]
     pub xv: Vec<FpuzzlesXVPair>,
+    #[serde(default)]
+    pub difference: Vec<FpuzzlesOrthoPair>,
+    #[serde(default)]
+    pub ratio: Vec<FpuzzlesOrthoPair>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -86,6 +90,12 @@ pub struct FpuzzlesSingleCell {
 pub struct FpuzzlesXVPair {
     pub cells: (FpuzzlesCellRef, FpuzzlesCellRef),
     pub value: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FpuzzlesOrthoPair {
+    pub cells: (FpuzzlesCellRef, FpuzzlesCellRef),
+    pub value: Option<i32>,
 }
 
 impl<'de> Deserialize<'de> for FpuzzlesCellRef {

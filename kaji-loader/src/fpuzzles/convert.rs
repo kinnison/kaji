@@ -126,6 +126,28 @@ impl From<FpuzzlesData> for PuzzleData {
                 });
         }
 
+        for diff in val.difference {
+            grid.rules_mut()
+                .pair_relationships
+                .relationships
+                .push(RawSudokuPairRelationship {
+                    cell_a: (diff.cells.0.row, diff.cells.0.col),
+                    cell_b: (diff.cells.1.row, diff.cells.1.col),
+                    relationship: CellPairRelationship::Difference(diff.value.unwrap_or(1)),
+                });
+        }
+
+        for ratio in val.ratio {
+            grid.rules_mut()
+                .pair_relationships
+                .relationships
+                .push(RawSudokuPairRelationship {
+                    cell_a: (ratio.cells.0.row, ratio.cells.0.col),
+                    cell_b: (ratio.cells.1.row, ratio.cells.1.col),
+                    relationship: CellPairRelationship::Ratio(ratio.value.unwrap_or(2)),
+                });
+        }
+
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 
         puzzle.push_grid(grid);
