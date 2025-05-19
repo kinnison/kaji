@@ -84,7 +84,7 @@ impl From<FpuzzlesData> for PuzzleData {
                 // -> (a,f) (b,e) (c,d)
                 // a,b,c
                 // -> (a,c)
-                for (a, b) in line.iter().zip(line.iter().rev()) {
+                for (a, b) in line.iter().zip(line.iter().rev()).take(line.len() >> 1) {
                     grid.rules_mut().clone_pairs.push(SudokuGridRuleCloneData {
                         a: (a.row, a.col),
                         b: (b.row, b.col),
