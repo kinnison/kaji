@@ -10,6 +10,8 @@ use rstest::rstest;
 #[case::irregular_regions("piggly-wiggly")]
 #[case::quadruple("quad-bike")]
 #[case::diagonals("wormhole-sixxtreme")]
+#[case::xv("finger-counting")]
+#[case::nonconsecutive("our-lady-of-the-adjacent")]
 fn fpuzzle_works(#[case] puzzle: &str) {
     let (puzzledata, puzzle) = load_fpuzzles_puzzle(puzzle);
 
