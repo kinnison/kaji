@@ -1,9 +1,12 @@
 use std::num::NonZeroUsize;
 
 use kaji::SymbolValue;
-use kaji_rules::puzzledata::{
-    GridData, GridDataKind, PuzzleData, SudokuGridData, SudokuGridRuleCloneData,
-    SudokuGridRuleQuadrupleData, SymbolData, SymbolSetData,
+use kaji_rules::{
+    puzzledata::{
+        GridData, GridDataKind, PuzzleData, RawSudokuPairRelationship, SudokuGridData,
+        SudokuGridRuleCloneData, SudokuGridRuleQuadrupleData, SymbolData, SymbolSetData,
+    },
+    rules::cellpairs::CellPairRelationship,
 };
 
 use super::FpuzzlesData;
@@ -103,6 +106,24 @@ impl From<FpuzzlesData> for PuzzleData {
             grid.rules_mut()
                 .even_cells
                 .push((even.cell.row, even.cell.col));
+        }
+
+        grid.rules_mut().pair_relationships.nonconsecutive = val.nonconsecutive;
+
+        for xvpair in val.xv {
+            let rel = if xvpair.value == "X" {
+                CellPairRelationship::Sum(10)
+            } else {
+                CellPairRelationship::Sum(5)
+            };
+            grid.rules_mut()
+                .pair_relationships
+                .relationships
+                .push(RawSudokuPairRelationship {
+                    cell_a: (xvpair.cells.0.row, xvpair.cells.0.col),
+                    cell_b: (xvpair.cells.1.row, xvpair.cells.1.col),
+                    relationship: rel,
+                });
         }
 
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
