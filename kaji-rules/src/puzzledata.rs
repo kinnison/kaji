@@ -5,7 +5,7 @@ use std::num::NonZeroUsize;
 
 use kaji::{PuzzleBuilder, Rule, Symbol, SymbolValue};
 
-use crate::rules::sudoku::SudokuGrid;
+use crate::rules::{cellpairs::CellPairRelationship, sudoku::SudokuGrid};
 
 #[derive(Debug, Default)]
 pub struct PuzzleData {
@@ -60,6 +60,7 @@ pub struct SudokuGridRulesData {
     pub odd_cells: Vec<(usize, usize)>,
     /// (row,col) 1 based    
     pub even_cells: Vec<(usize, usize)>,
+    pub pair_relationships: SudokuGridRulePairRelationsData,
 }
 
 #[derive(Debug)]
@@ -76,6 +77,27 @@ pub struct SudokuGridRuleCloneData {
     pub a: (usize, usize),
     /// (row,col) 1-based
     pub b: (usize, usize),
+}
+
+#[derive(Debug, Default)]
+pub struct SudokuGridRulePairRelationsData {
+    // Negative constraints
+    pub nonconsecutive: bool,
+    pub anti_black_dot: bool,
+    pub anti_x: bool,
+    pub anti_v: bool,
+    // Cells which have an explicit relationship
+    pub relationships: Vec<RawSudokuPairRelationship>,
+}
+
+#[derive(Debug)]
+pub struct RawSudokuPairRelationship {
+    /// 1-based (row,col)
+    pub cell_a: (usize, usize),
+    /// 1-based (row,col)
+    pub cell_b: (usize, usize),
+    // Relationship
+    pub relationship: CellPairRelationship,
 }
 
 impl PuzzleData {
