@@ -3,7 +3,7 @@ use kaji_rules::puzzledata::GridDataKind;
 use kaji_bin::load_fpuzzles_puzzle;
 
 fn main() {
-    let (puzzledata, puzzle) = load_fpuzzles_puzzle("our-lady-of-the-adjacent");
+    let (puzzledata, puzzle) = load_fpuzzles_puzzle("alien-abacus");
 
     let board = puzzle.solve();
     puzzle.print_board(&board);
