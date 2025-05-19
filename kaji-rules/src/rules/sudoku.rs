@@ -8,7 +8,11 @@ use crate::{
     techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol},
 };
 
-use super::{antioffset::AntiOffset, regions::NonRepeatRegion};
+use super::{
+    antioffset::AntiOffset,
+    cellpairs::{CellPairRelationship, CellPairsRule},
+    regions::NonRepeatRegion,
+};
 
 pub struct SudokuGrid<'grid> {
     digits: SymbolSetId,
@@ -145,6 +149,34 @@ impl Rule for SudokuGrid<'_> {
         for even in &raw.rules().even_cells {
             builder.add_constraint(OddEven::new(rows[even.0 - 1][even.1 - 1], false));
         }
+
+        // Cell pairs rules (eg. XV, et al)
+        let mut neg_rels = vec![];
+        let rels = &raw.rules().pair_relationships;
+        if rels.nonconsecutive {
+            neg_rels.push(CellPairRelationship::Difference(1));
+        }
+        if rels.anti_black_dot {
+            neg_rels.push(CellPairRelationship::Ratio(2));
+        }
+        if rels.anti_v {
+            neg_rels.push(CellPairRelationship::Sum(5));
+        }
+        if rels.anti_x {
+            neg_rels.push(CellPairRelationship::Sum(10));
+        }
+
+        let pos_rels = rels.relationships.iter().map(|r| {
+            (
+                rows[r.cell_a.0 - 1][r.cell_a.1 - 1],
+                rows[r.cell_b.0 - 1][r.cell_b.1 - 1],
+                r.relationship,
+            )
+        });
+
+        CellPairsRule::new(cells.iter().copied(), pos_rels, neg_rels).apply(builder);
+
+        // Add Sudoku techniques
 
         builder.add_technique(NakedSingle::new(self.digits));
         builder.add_technique(HiddenSingle::new(self.digits));
