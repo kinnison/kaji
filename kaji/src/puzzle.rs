@@ -1,7 +1,7 @@
 use crate::constraints::{Constraint, LogicalStep};
 use crate::{symbols::*, Technique};
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Display;
 use std::ops::{BitAnd, BitOr};
 
@@ -302,6 +302,33 @@ impl PuzzleBuilder {
 
     pub fn cell_at(&self, row: usize, col: usize) -> Option<CellIndex> {
         self.rowcols.get(&(row, col)).copied()
+    }
+
+    pub fn all_orthogonal_pairs(
+        &self,
+        cells: &[CellIndex],
+    ) -> impl Iterator<Item = (CellIndex, CellIndex)> {
+        const OFS: [(i32, i32); 4] = [(-1, 0), (0, -1), (1, 0), (0, 1)];
+        let mut ret: HashSet<(CellIndex, CellIndex)> = HashSet::new();
+
+        for cell_a in cells.iter().copied() {
+            let info_a = self.cell_info(cell_a);
+            let row_a = info_a.row() as i32;
+            let col_a = info_a.col() as i32;
+            for (row_ofs, col_ofs) in OFS {
+                let row_b = row_a + row_ofs;
+                let col_b = col_a + col_ofs;
+                if let Some(cell_b) = self.cell_at(row_b as usize, col_b as usize) {
+                    if cell_a.0 < cell_b.0 {
+                        ret.insert((cell_a, cell_b));
+                    } else {
+                        ret.insert((cell_b, cell_a));
+                    }
+                }
+            }
+        }
+
+        ret.into_iter()
     }
 }
 
