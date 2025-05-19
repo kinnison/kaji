@@ -7,3 +7,6 @@ edition = "2021"
 kaji = { path = "../kaji" }
 kaji-rules = { path = "../kaji-rules" }
 kaji-loader = { path = "../kaji-loader" }
+
+[dev-dependencies]
+rstest = "0.25.0"

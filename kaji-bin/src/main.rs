@@ -1,25 +1,9 @@
-use std::path::PathBuf;
+use kaji_rules::puzzledata::GridDataKind;
 
-use kaji::PuzzleBuilder;
-use kaji_loader::fpuzzles::FpuzzlesData;
-use kaji_rules::puzzledata::{GridDataKind, PuzzleData};
-
-fn load_sample(leaf: &str) -> String {
-    let ctoml = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let fpath = ctoml.join(format!("../sample-puzzles/{leaf}"));
-    std::fs::read_to_string(fpath).expect("Unable to read file")
-}
+use kaji_bin::load_fpuzzles_puzzle;
 
 fn main() {
-    let mut builder = PuzzleBuilder::default();
-
-    let raw = FpuzzlesData::load(load_sample("strange-level.json")).unwrap();
-
-    let puzzledata = PuzzleData::from(raw);
-
-    puzzledata.build(&mut builder);
-
-    let puzzle = builder.build();
+    let (puzzledata, puzzle) = load_fpuzzles_puzzle("strange-level");
 
     let board = puzzle.solve();
     puzzle.print_board(&board);
