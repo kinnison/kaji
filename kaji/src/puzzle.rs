@@ -69,7 +69,7 @@ pub struct Region {
 }
 
 /// An index into the [cells][CellInfo] in a [`Puzzle`]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct CellIndex(usize);
 
@@ -123,7 +123,7 @@ pub enum Effect {
     Changed,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct CellValue {
     symbols: Vec<SymbolId>,
     value: i32,
@@ -219,6 +219,10 @@ impl PuzzleBuilder {
 
     pub fn symbols(&self, set: SymbolSetId) -> impl Iterator<Item = SymbolId> {
         self.symbols[set.0].to_ids(set.0)
+    }
+
+    pub fn regions(&self) -> impl Iterator<Item = RegionId> {
+        (0..self.regions.len()).map(|n| RegionId(n))
     }
 
     pub fn region(&self, region: RegionId) -> &Region {
