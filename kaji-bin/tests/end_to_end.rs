@@ -34,8 +34,8 @@ fn fpuzzle_works(#[case] puzzle: &str) {
 #[rstest]
 #[case::antiknight("antiknight1")]
 #[case::unknown("puzzle1")]
-// TODO: Determine what this puzzle was and what we have broken?
-//#[case::unknown("puzzle2")]
+// TODO: puzzle2 requires finned xwings, when we implement those, we can enable this
+//#[case::finned_xwing("puzzle2")]
 #[case::swordfish("swordfish1")]
 #[case::xwing("xwing1")]
 #[case::xwing("xwing2")]
