@@ -334,6 +334,22 @@ impl PuzzleBuilder {
 
         ret.into_iter()
     }
+
+    pub fn orthogonal_cells(&self, cell: CellIndex) -> impl Iterator<Item = CellIndex> {
+        let mut ret = HashSet::new();
+        let cell_info = self.cell_info(cell);
+        let row = cell_info.row() as i32;
+        let col = cell_info.col() as i32;
+        const OFS: [(i32, i32); 4] = [(-1, 0), (0, -1), (1, 0), (0, 1)];
+        for (row_ofs, col_ofs) in OFS {
+            let orow = row + row_ofs;
+            let ocol = col + col_ofs;
+            if let Some(other) = self.cell_at(orow as usize, ocol as usize) {
+                ret.insert(other);
+            }
+        }
+        ret.into_iter()
+    }
 }
 
 impl Puzzle {
