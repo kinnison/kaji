@@ -2,9 +2,10 @@
 
 use std::{collections::HashSet, fmt};
 
+use itertools::Itertools;
 use kaji::{CellIndex, PuzzleBuilder, Rule};
 
-use crate::constraints::CellPairConstraint;
+use crate::constraints::{CellPairConstraint, DoubleCellPairConstraint};
 
 /// Explicit relationship between a pair of cells
 #[derive(Debug, Clone, Copy)]
@@ -58,6 +59,40 @@ impl Rule for CellPairsRule {
             used_pairs.insert((cell_a, cell_b));
             used_pairs.insert((cell_b, cell_a));
             builder.add_constraint(CellPairConstraint::new(cell_a, cell_b, rel, false));
+        }
+        let regions = builder.regions().collect_vec();
+        for (first, second) in self.rels.iter().tuple_combinations() {
+            if !(first.0 == second.0
+                || first.0 == second.1
+                || first.1 == second.0
+                || first.1 == second.1)
+            {
+                // no overlap
+                continue;
+            }
+            let overlap = if first.0 == second.0 || first.0 == second.1 {
+                first.0
+            } else {
+                first.1
+            };
+            let other_a = if first.0 == overlap { first.1 } else { first.0 };
+            let other_b = if second.0 == overlap {
+                second.1
+            } else {
+                second.0
+            };
+
+            if !regions.iter().copied().any(|r| {
+                let cells = builder.region(r).to_cells();
+                cells.contains(&other_a) && cells.contains(&other_b)
+            }) {
+                // No overlap found
+                continue;
+            }
+
+            builder.add_constraint(DoubleCellPairConstraint::new(
+                first.0, first.1, first.2, false, second.0, second.1, second.2, false, overlap,
+            ));
         }
         if self.negs.is_empty() {
             // Nothing more to do, so return

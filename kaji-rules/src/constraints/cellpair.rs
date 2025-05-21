@@ -114,3 +114,135 @@ impl CellPairRelationship {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct DoubleCellPairConstraint {
+    cell_a: CellIndex,
+    cell_b: CellIndex,
+    rel_ab: CellPairRelationship,
+    neg_ab: bool,
+    cell_c: CellIndex,
+    cell_d: CellIndex,
+    rel_cd: CellPairRelationship,
+    neg_cd: bool,
+    overlap: CellIndex,
+}
+
+impl DoubleCellPairConstraint {
+    pub fn new(
+        cell_a: CellIndex,
+        cell_b: CellIndex,
+        rel_ab: CellPairRelationship,
+        neg_ab: bool,
+        cell_c: CellIndex,
+        cell_d: CellIndex,
+        rel_cd: CellPairRelationship,
+        neg_cd: bool,
+        overlap: CellIndex,
+    ) -> Self {
+        assert!(cell_a == overlap || cell_b == overlap);
+        assert!(cell_c == overlap || cell_d == overlap);
+        Self {
+            cell_a,
+            cell_b,
+            rel_ab,
+            neg_ab,
+            cell_c,
+            cell_d,
+            rel_cd,
+            neg_cd,
+            overlap,
+        }
+    }
+}
+
+impl Constraint for DoubleCellPairConstraint {
+    fn difficulty(&self) -> u16 {
+        DIFFICULTY_MEDIUM + 1500
+    }
+
+    fn prep_board(&self, _state: &mut SolveState) {
+        // Nothing to do for now
+    }
+
+    fn logical_step(&self, state: &mut SolveState) -> LogicalStep {
+        // Essentially we have relationship ab and relationship cd.  We need to
+        // determine a limitation based on the overlap such that the other cells
+        // cannot be satisfied. then we can eliminate such.
+        let values_a = state.cell_values(self.cell_a).collect_vec();
+        let values_b = state.cell_values(self.cell_b).collect_vec();
+        let values_c = state.cell_values(self.cell_c).collect_vec();
+        let values_d = state.cell_values(self.cell_d).collect_vec();
+
+        for overlap_value in state.cell_values(self.overlap) {
+            let permitted_ab = if self.overlap == self.cell_a {
+                values_b
+                    .iter()
+                    .filter(|v| {
+                        self.rel_ab.satisfied(overlap_value.value(), v.value()) ^ self.neg_ab
+                    })
+                    .collect_vec()
+            } else {
+                values_a
+                    .iter()
+                    .filter(|v| {
+                        self.rel_ab.satisfied(v.value(), overlap_value.value()) ^ self.neg_ab
+                    })
+                    .collect_vec()
+            };
+            let permitted_cd = if self.overlap == self.cell_c {
+                values_d
+                    .iter()
+                    .filter(|v| {
+                        self.rel_cd.satisfied(overlap_value.value(), v.value()) ^ self.neg_cd
+                    })
+                    .collect_vec()
+            } else {
+                values_c
+                    .iter()
+                    .filter(|v| {
+                        self.rel_cd.satisfied(v.value(), overlap_value.value()) ^ self.neg_cd
+                    })
+                    .collect_vec()
+            };
+            // There must be at least one member of permitted_ab not in permitted_cd or vice-versa
+            if permitted_ab.iter().all(|abv| permitted_cd.contains(abv))
+                && permitted_cd.iter().all(|cdv| permitted_ab.contains(cdv))
+                && permitted_ab.len() < 2
+            {
+                // effectively the same sets, so eliminate overlap_value from the overlap cell
+                let mut action = LogicalStep::action(format!(
+                    "(Paired) {rel} {neg}between ",
+                    rel = self.rel_ab,
+                    neg = if self.neg_ab { "(negative) " } else { "" }
+                ));
+                action.push_cells(
+                    Some(state.cell_info(self.cell_a))
+                        .into_iter()
+                        .chain(Some(state.cell_info(self.cell_b))),
+                );
+                action.push_str(&format!(
+                    " and {rel} {neg}between ",
+                    rel = self.rel_cd,
+                    neg = if self.neg_cd { "(negative) " } else { "" }
+                ));
+                action.push_cells(
+                    Some(state.cell_info(self.cell_c))
+                        .into_iter()
+                        .chain(Some(state.cell_info(self.cell_d))),
+                );
+                action.push_str(" eliminates ");
+                action.push_symbols(Some(state.symbol(overlap_value.symbols()[0])));
+                action.push_str(" from ");
+                action.push_cells(Some(state.cell_info(self.overlap)));
+                if state
+                    .eliminate(self.overlap, overlap_value.symbols()[0])
+                    .changed()
+                {
+                    return action;
+                }
+            }
+        }
+        LogicalStep::NoAction
+    }
+}
