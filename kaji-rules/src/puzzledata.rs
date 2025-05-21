@@ -61,6 +61,10 @@ pub struct SudokuGridRulesData {
     /// (row,col) 1 based    
     pub even_cells: Vec<(usize, usize)>,
     pub pair_relationships: SudokuGridRulePairRelationsData,
+    /// (row,col) 1 based
+    pub maximum: Vec<(usize, usize)>,
+    /// (row,col) 1 based
+    pub minimum: Vec<(usize, usize)>,
 }
 
 #[derive(Debug)]

@@ -1,5 +1,7 @@
 //! Sudoku grids
 
+use std::collections::HashSet;
+
 use kaji::{CellInfo, PuzzleBuilder, Region, Rule, SymbolSetId};
 
 use crate::{
@@ -174,7 +176,41 @@ impl Rule for SudokuGrid<'_> {
             )
         });
 
-        CellPairsRule::new(cells.iter().copied(), pos_rels, neg_rels).apply(builder);
+        let minimum = raw
+            .rules()
+            .minimum
+            .iter()
+            .copied()
+            .map(|(row, col)| rows[row - 1][col - 1])
+            .collect::<HashSet<_>>();
+
+        let maximum = raw
+            .rules()
+            .maximum
+            .iter()
+            .copied()
+            .map(|(row, col)| rows[row - 1][col - 1])
+            .collect::<HashSet<_>>();
+
+        let mut minimax = vec![];
+
+        for cell in minimum.iter().copied() {
+            for other in builder.orthogonal_cells(cell) {
+                if !minimum.contains(&other) {
+                    minimax.push((cell, other, CellPairRelationship::LessThan));
+                }
+            }
+        }
+
+        for cell in maximum.iter().copied() {
+            for other in builder.orthogonal_cells(cell) {
+                if !maximum.contains(&other) {
+                    minimax.push((other, cell, CellPairRelationship::LessThan));
+                }
+            }
+        }
+
+        CellPairsRule::new(cells.iter().copied(), pos_rels.chain(minimax), neg_rels).apply(builder);
 
         // Add Sudoku techniques
 
