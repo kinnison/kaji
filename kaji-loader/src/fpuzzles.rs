@@ -49,6 +49,10 @@ pub struct FpuzzlesData {
     pub difference: Vec<FpuzzlesOrthoPair>,
     #[serde(default)]
     pub ratio: Vec<FpuzzlesOrthoPair>,
+    #[serde(default)]
+    pub maximum: Vec<FpuzzlesSingleCell>,
+    #[serde(default)]
+    pub minimum: Vec<FpuzzlesSingleCell>,
 }
 
 #[derive(Debug, Deserialize)]

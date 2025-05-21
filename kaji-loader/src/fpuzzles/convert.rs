@@ -148,6 +148,17 @@ impl From<FpuzzlesData> for PuzzleData {
                 });
         }
 
+        for maximum in val.maximum {
+            grid.rules_mut()
+                .maximum
+                .push((maximum.cell.row, maximum.cell.col));
+        }
+        for minimum in val.minimum {
+            grid.rules_mut()
+                .minimum
+                .push((minimum.cell.row, minimum.cell.col));
+        }
+
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 
         puzzle.push_grid(grid);
