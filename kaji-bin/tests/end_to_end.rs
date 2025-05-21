@@ -12,6 +12,7 @@ use rstest::rstest;
 #[case::diagonals("wormhole-sixxtreme")]
 #[case::xv("finger-counting")]
 #[case::nonconsecutive("our-lady-of-the-adjacent")]
+#[case::kropki("alien-abacus")]
 fn fpuzzle_works(#[case] puzzle: &str) {
     let (puzzledata, puzzle) = load_fpuzzles_puzzle(puzzle);
 
