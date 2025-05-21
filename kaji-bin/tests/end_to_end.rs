@@ -13,6 +13,7 @@ use rstest::rstest;
 #[case::xv("finger-counting")]
 #[case::nonconsecutive("our-lady-of-the-adjacent")]
 #[case::kropki("alien-abacus")]
+#[case::maximum("fortress-maximum")]
 fn fpuzzle_works(#[case] puzzle: &str) {
     let (puzzledata, puzzle) = load_fpuzzles_puzzle(puzzle);
 

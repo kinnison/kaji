@@ -1,0 +1,382 @@
+{
+  "size": 6,
+  "title": "Fortress Sudoku",
+  "author": "funwithpuzzles",
+  "ruleset": "https://www.funwithpuzzles.com/2015/02/fortress-sudoku-mini-sudoku-series-28.html",
+  "grid": [
+    [
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          5
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "region": 1
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3
+        ],
+        "region": 2
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "region": 2
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          4,
+          5
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4
+        ],
+        "region": 1
+      },
+      {
+        "candidates": [
+          3
+        ],
+        "value": 3,
+        "given": true
+      },
+      {
+        "candidates": [
+          5
+        ],
+        "region": 2
+      },
+      {
+        "candidates": [
+          1,
+          2
+        ],
+        "region": 2
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          3,
+          5
+        ],
+        "region": 0
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3
+        ],
+        "region": 0
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          5
+        ],
+        "region": 1
+      },
+      {
+        "candidates": [
+          5
+        ],
+        "region": 1
+      },
+      {
+        "candidates": [
+          4
+        ],
+        "region": 2,
+        "value": 4,
+        "given": true
+      },
+      {
+        "candidates": [
+          6
+        ],
+        "region": 2,
+        "value": 6,
+        "given": true
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2
+        ],
+        "region": 3,
+        "value": 2,
+        "given": true
+      },
+      {
+        "candidates": [
+          4
+        ],
+        "region": 3,
+        "value": 4,
+        "given": true
+      },
+      {
+        "candidates": [
+          5,
+          6
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          5,
+          6
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          5
+        ],
+        "region": 5
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          5
+        ],
+        "region": 5
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          5
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          5,
+          6
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          3
+        ],
+        "value": 3,
+        "given": true
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          3,
+          5,
+          6
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          5
+        ],
+        "region": 3
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "region": 4
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ]
+  ],
+  "maximum": [
+    {
+      "cell": "R1C1"
+    },
+    {
+      "cell": "R2C2"
+    },
+    {
+      "cell": "R3C3"
+    },
+    {
+      "cell": "R4C4"
+    },
+    {
+      "cell": "R5C5"
+    },
+    {
+      "cell": "R6C6"
+    },
+    {
+      "cell": "R1C6"
+    },
+    {
+      "cell": "R2C5"
+    },
+    {
+      "cell": "R3C4"
+    },
+    {
+      "cell": "R4C3"
+    },
+    {
+      "cell": "R5C2"
+    },
+    {
+      "cell": "R6C1"
+    }
+  ],
+  "solution": [
+    5,
+    2,
+    6,
+    4,
+    1,
+    3,
+    4,
+    6,
+    1,
+    3,
+    5,
+    2,
+    3,
+    1,
+    2,
+    5,
+    4,
+    6,
+    2,
+    4,
+    5,
+    6,
+    3,
+    1,
+    1,
+    5,
+    3,
+    2,
+    6,
+    4,
+    6,
+    3,
+    4,
+    1,
+    2,
+    5
+  ]
+}
