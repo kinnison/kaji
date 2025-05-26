@@ -8,7 +8,7 @@ use kaji::{CellIndex, PuzzleBuilder, Rule};
 use crate::constraints::{CellPairConstraint, DoubleCellPairConstraint};
 
 /// Explicit relationship between a pair of cells
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CellPairRelationship {
     LessThan,
     LessEqual,
@@ -33,7 +33,7 @@ impl fmt::Display for CellPairRelationship {
 #[derive(Debug)]
 pub struct CellPairsRule {
     cells: Vec<CellIndex>,
-    rels: Vec<(CellIndex, CellIndex, CellPairRelationship)>,
+    rels: HashSet<(CellIndex, CellIndex, CellPairRelationship)>,
     negs: Vec<CellPairRelationship>,
 }
 
