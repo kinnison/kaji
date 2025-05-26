@@ -14,6 +14,9 @@ use rstest::rstest;
 #[case::nonconsecutive("our-lady-of-the-adjacent")]
 #[case::kropki("alien-abacus")]
 #[case::maximum("fortress-maximum")]
+#[case::thermo("frost")]
+#[case::thermo("galactic-map")]
+#[case::thermo("swirl-of-steam")]
 fn fpuzzle_works(#[case] puzzle: &str) {
     let (puzzledata, puzzle) = load_fpuzzles_puzzle(puzzle);
 
