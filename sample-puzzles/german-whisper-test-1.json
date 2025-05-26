@@ -1,0 +1,478 @@
+{
+  "size": 6,
+  "title": "GW Test 1",
+  "author": "Kinnison",
+  "grid": [
+    [
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          3
+        ],
+        "value": 3,
+        "given": true
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1
+        ],
+        "value": 1,
+        "given": true
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          2
+        ],
+        "value": 2,
+        "given": true
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    ]
+  ],
+  "solution": [
+    4,
+    1,
+    5,
+    2,
+    6,
+    3,
+    3,
+    6,
+    2,
+    5,
+    1,
+    4,
+    1,
+    3,
+    6,
+    4,
+    2,
+    5,
+    2,
+    5,
+    4,
+    1,
+    3,
+    6,
+    5,
+    2,
+    3,
+    6,
+    4,
+    1,
+    6,
+    4,
+    1,
+    3,
+    5,
+    2
+  ],
+  "line": [
+    {
+      "lines": [
+        [
+          "R1C1",
+          "R1C2",
+          "R1C3",
+          "R2C3",
+          "R2C2"
+        ]
+      ],
+      "outlineC": "#67F067",
+      "width": 0.1875,
+      "fromConstraint": "German Whispers"
+    },
+    {
+      "lines": [
+        [
+          "R1C6",
+          "R1C5",
+          "R1C4",
+          "R2C4",
+          "R2C5"
+        ]
+      ],
+      "outlineC": "#67F067",
+      "width": 0.1875,
+      "fromConstraint": "German Whispers"
+    },
+    {
+      "lines": [
+        [
+          "R4C2",
+          "R5C2",
+          "R6C1"
+        ]
+      ],
+      "outlineC": "#67F067",
+      "width": 0.1875,
+      "fromConstraint": "German Whispers"
+    },
+    {
+      "lines": [
+        [
+          "R4C6",
+          "R4C5",
+          "R5C4",
+          "R6C3"
+        ]
+      ],
+      "outlineC": "#67F067",
+      "width": 0.1875,
+      "fromConstraint": "German Whispers"
+    }
+  ],
+  "whispers": [
+    {
+      "lines": [
+        [
+          "R1C1",
+          "R1C2",
+          "R1C3",
+          "R2C3",
+          "R2C2"
+        ]
+      ],
+      "value": "3"
+    },
+    {
+      "lines": [
+        [
+          "R1C6",
+          "R1C5",
+          "R1C4",
+          "R2C4",
+          "R2C5"
+        ]
+      ],
+      "value": "3"
+    },
+    {
+      "lines": [
+        [
+          "R4C2",
+          "R5C2",
+          "R6C1"
+        ]
+      ],
+      "value": "3"
+    },
+    {
+      "lines": [
+        [
+          "R4C6",
+          "R4C5",
+          "R5C4",
+          "R6C3"
+        ]
+      ],
+      "value": "3"
+    }
+  ]
+}
