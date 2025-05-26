@@ -67,6 +67,8 @@ pub struct SudokuGridRulesData {
     pub minimum: Vec<(usize, usize)>,
     /// [(row,col)] 1 based
     pub thermometer: Vec<Vec<(usize, usize)>>,
+    /// [diff,[(row,col)]]
+    pub whispers: Vec<(i32, Vec<(usize, usize)>)>,
 }
 
 #[derive(Debug)]

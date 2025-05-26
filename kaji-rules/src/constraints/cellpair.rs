@@ -110,6 +110,7 @@ impl CellPairRelationship {
             Difference(n) => (a - b).abs() == *n,
             Sum(n) => (a + b) == *n,
             Ratio(n) => (a == (b * *n)) || (b == (a * *n)),
+            DiffAtLeast(n) => (a - b).abs() >= *n,
         }
     }
 }

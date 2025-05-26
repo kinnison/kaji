@@ -233,9 +233,38 @@ impl Rule for SudokuGrid<'_> {
             }
         }
 
+        let mut whisper_pairs = vec![];
+
+        for (diff, line) in raw.rules().whispers.iter() {
+            let name = match (*diff, raw.size()) {
+                (3, 6) | (5, 9) => "German Whisper".to_string(),
+                (2, 6) | (4, 9) => "Dutch Whisper".to_string(),
+                _ => format!("Whisper {diff}"),
+            };
+            let start = line[0];
+            let finish = line.iter().copied().last().unwrap();
+            let name = format!(
+                "{name} from r{}c{} to r{}c{}",
+                start.0, start.1, finish.0, finish.1
+            );
+            for (cell_a, cell_b) in line.iter().copied().tuple_windows() {
+                let cell_a = rows[cell_a.0 - 1][cell_a.1 - 1];
+                let cell_b = rows[cell_b.0 - 1][cell_b.1 - 1];
+                whisper_pairs.push((
+                    name.clone(),
+                    cell_a,
+                    cell_b,
+                    CellPairRelationship::DiffAtLeast(*diff),
+                ));
+            }
+        }
+
         CellPairsRule::new(
             cells.iter().copied(),
-            pos_rels.chain(minimax).chain(thermo_pairs),
+            pos_rels
+                .chain(minimax)
+                .chain(thermo_pairs)
+                .chain(whisper_pairs),
             neg_rels,
         )
         .apply(builder);

@@ -15,6 +15,7 @@ pub enum CellPairRelationship {
     Difference(i32),
     Sum(i32),
     Ratio(i32),
+    DiffAtLeast(i32),
 }
 
 impl fmt::Display for CellPairRelationship {
@@ -26,6 +27,7 @@ impl fmt::Display for CellPairRelationship {
             Difference(n) => write!(f, "Difference of {n}"),
             Sum(n) => write!(f, "Sum to {n}"),
             Ratio(n) => write!(f, "Ratio of {n}"),
+            DiffAtLeast(n) => write!(f, "Difference of at least {n}"),
         }
     }
 }
@@ -51,6 +53,7 @@ impl CellPairRelationship {
                 2 => "Anti-Black-Dot".into(),
                 _ => format!("Anti-ratio of {r}"),
             },
+            CellPairRelationship::DiffAtLeast(n) => format!("Difference of at most {}", *n - 1),
         }
     }
 }
