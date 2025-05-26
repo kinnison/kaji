@@ -9,6 +9,7 @@ use serde_json::Result;
 mod convert;
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FpuzzlesData {
     pub size: usize,
     #[serde(default)]
@@ -53,6 +54,8 @@ pub struct FpuzzlesData {
     pub maximum: Vec<FpuzzlesSingleCell>,
     #[serde(default)]
     pub minimum: Vec<FpuzzlesSingleCell>,
+    #[serde(default)]
+    pub thermometer: Vec<FpuzzlesLines>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -159,6 +159,14 @@ impl From<FpuzzlesData> for PuzzleData {
                 .push((minimum.cell.row, minimum.cell.col));
         }
 
+        for thermo in val.thermometer {
+            for line in thermo.lines {
+                grid.rules_mut()
+                    .thermometer
+                    .push(line.into_iter().map(|c| (c.row, c.col)).collect());
+            }
+        }
+
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 
         puzzle.push_grid(grid);
