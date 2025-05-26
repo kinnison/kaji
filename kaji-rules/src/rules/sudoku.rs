@@ -171,6 +171,7 @@ impl Rule for SudokuGrid<'_> {
 
         let pos_rels = rels.relationships.iter().map(|r| {
             (
+                r.name.clone(),
                 rows[r.cell_a.0 - 1][r.cell_a.1 - 1],
                 rows[r.cell_b.0 - 1][r.cell_b.1 - 1],
                 r.relationship,
@@ -196,17 +197,19 @@ impl Rule for SudokuGrid<'_> {
         let mut minimax = vec![];
 
         for cell in minimum.iter().copied() {
+            let name = format!("Minimum cell at {}", builder.cell_info(cell));
             for other in builder.orthogonal_cells(cell) {
                 if !minimum.contains(&other) {
-                    minimax.push((cell, other, CellPairRelationship::LessThan));
+                    minimax.push((name.clone(), cell, other, CellPairRelationship::LessThan));
                 }
             }
         }
 
         for cell in maximum.iter().copied() {
+            let name = format!("Maximum cell at {}", builder.cell_info(cell));
             for other in builder.orthogonal_cells(cell) {
                 if !maximum.contains(&other) {
-                    minimax.push((other, cell, CellPairRelationship::LessThan));
+                    minimax.push((name.clone(), other, cell, CellPairRelationship::LessThan));
                 }
             }
         }
@@ -214,8 +217,15 @@ impl Rule for SudokuGrid<'_> {
         let mut thermo_pairs = vec![];
 
         for thermo in raw.rules().thermometer.iter() {
+            let start = thermo[0];
+            let finish = thermo.iter().last().copied().unwrap();
+            let name = format!(
+                "Thermometer from r{}c{} to r{}c{}",
+                start.0, start.1, finish.0, finish.1
+            );
             for (a, b) in thermo.iter().copied().tuple_windows() {
                 thermo_pairs.push((
+                    name.clone(),
                     rows[a.0 - 1][a.1 - 1],
                     rows[b.0 - 1][b.1 - 1],
                     CellPairRelationship::LessThan,

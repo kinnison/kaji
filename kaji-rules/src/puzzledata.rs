@@ -98,6 +98,7 @@ pub struct SudokuGridRulePairRelationsData {
 
 #[derive(Debug)]
 pub struct RawSudokuPairRelationship {
+    pub name: String,
     /// 1-based (row,col)
     pub cell_a: (usize, usize),
     /// 1-based (row,col)

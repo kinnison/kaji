@@ -7,6 +7,7 @@ use crate::rules::cellpairs::CellPairRelationship;
 
 #[derive(Debug)]
 pub struct CellPairConstraint {
+    name: String,
     cell_a: CellIndex,
     cell_b: CellIndex,
     rel: CellPairRelationship,
@@ -14,8 +15,15 @@ pub struct CellPairConstraint {
 }
 
 impl CellPairConstraint {
-    pub fn new(cell_a: CellIndex, cell_b: CellIndex, rel: CellPairRelationship, neg: bool) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        cell_a: CellIndex,
+        cell_b: CellIndex,
+        rel: CellPairRelationship,
+        neg: bool,
+    ) -> Self {
         Self {
+            name: name.into(),
             cell_a,
             cell_b,
             rel,
@@ -42,16 +50,7 @@ impl Constraint for CellPairConstraint {
         // eliminate it if possible
         // Repeat value_b/value_a swapped
 
-        let mut action = LogicalStep::action(format!(
-            "{rel} {neg}between ",
-            rel = self.rel,
-            neg = if self.neg { "(negative) " } else { "" }
-        ));
-        action.push_cells(
-            Some(state.cell_info(self.cell_a))
-                .into_iter()
-                .chain(Some(state.cell_info(self.cell_b))),
-        );
+        let mut action = LogicalStep::action(&self.name);
         action.push_str(" eliminates ");
 
         let mut changed = false;
@@ -117,6 +116,7 @@ impl CellPairRelationship {
 
 #[derive(Debug)]
 pub struct DoubleCellPairConstraint {
+    name: String,
     cell_a: CellIndex,
     cell_b: CellIndex,
     rel_ab: CellPairRelationship,
@@ -130,6 +130,7 @@ pub struct DoubleCellPairConstraint {
 
 impl DoubleCellPairConstraint {
     pub fn new(
+        name: impl Into<String>,
         cell_a: CellIndex,
         cell_b: CellIndex,
         rel_ab: CellPairRelationship,
@@ -143,6 +144,7 @@ impl DoubleCellPairConstraint {
         assert!(cell_a == overlap || cell_b == overlap);
         assert!(cell_c == overlap || cell_d == overlap);
         Self {
+            name: name.into(),
             cell_a,
             cell_b,
             rel_ab,
@@ -211,26 +213,7 @@ impl Constraint for DoubleCellPairConstraint {
                 && permitted_ab.len() < 2
             {
                 // effectively the same sets, so eliminate overlap_value from the overlap cell
-                let mut action = LogicalStep::action(format!(
-                    "(Paired) {rel} {neg}between ",
-                    rel = self.rel_ab,
-                    neg = if self.neg_ab { "(negative) " } else { "" }
-                ));
-                action.push_cells(
-                    Some(state.cell_info(self.cell_a))
-                        .into_iter()
-                        .chain(Some(state.cell_info(self.cell_b))),
-                );
-                action.push_str(&format!(
-                    " and {rel} {neg}between ",
-                    rel = self.rel_cd,
-                    neg = if self.neg_cd { "(negative) " } else { "" }
-                ));
-                action.push_cells(
-                    Some(state.cell_info(self.cell_c))
-                        .into_iter()
-                        .chain(Some(state.cell_info(self.cell_d))),
-                );
+                let mut action = LogicalStep::action(&self.name);
                 action.push_str(" eliminates ");
                 action.push_symbols(Some(state.symbol(overlap_value.symbols()[0])));
                 action.push_str(" from ");

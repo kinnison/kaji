@@ -120,6 +120,14 @@ impl From<FpuzzlesData> for PuzzleData {
                 .pair_relationships
                 .relationships
                 .push(RawSudokuPairRelationship {
+                    name: format!(
+                        "{} between r{}c{} and r{}c{}",
+                        xvpair.value,
+                        xvpair.cells.0.row,
+                        xvpair.cells.0.col,
+                        xvpair.cells.1.row,
+                        xvpair.cells.1.col
+                    ),
                     cell_a: (xvpair.cells.0.row, xvpair.cells.0.col),
                     cell_b: (xvpair.cells.1.row, xvpair.cells.1.col),
                     relationship: rel,
@@ -131,6 +139,14 @@ impl From<FpuzzlesData> for PuzzleData {
                 .pair_relationships
                 .relationships
                 .push(RawSudokuPairRelationship {
+                    name: format!(
+                        "White dot ({}) between r{}c{} and r{}c{}",
+                        diff.value.unwrap_or(1),
+                        diff.cells.0.row,
+                        diff.cells.0.col,
+                        diff.cells.1.row,
+                        diff.cells.1.col
+                    ),
                     cell_a: (diff.cells.0.row, diff.cells.0.col),
                     cell_b: (diff.cells.1.row, diff.cells.1.col),
                     relationship: CellPairRelationship::Difference(diff.value.unwrap_or(1)),
@@ -142,6 +158,14 @@ impl From<FpuzzlesData> for PuzzleData {
                 .pair_relationships
                 .relationships
                 .push(RawSudokuPairRelationship {
+                    name: format!(
+                        "Black dot ({}) between r{}c{} and r{}c{}",
+                        ratio.value.unwrap_or(1),
+                        ratio.cells.0.row,
+                        ratio.cells.0.col,
+                        ratio.cells.1.row,
+                        ratio.cells.1.col
+                    ),
                     cell_a: (ratio.cells.0.row, ratio.cells.0.col),
                     cell_b: (ratio.cells.1.row, ratio.cells.1.col),
                     relationship: CellPairRelationship::Ratio(ratio.value.unwrap_or(2)),

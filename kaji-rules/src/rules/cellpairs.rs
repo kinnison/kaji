@@ -30,17 +30,42 @@ impl fmt::Display for CellPairRelationship {
     }
 }
 
+impl CellPairRelationship {
+    pub fn neg_name(&self) -> String {
+        match self {
+            CellPairRelationship::LessThan => "Greater-than-or-equal".into(),
+            CellPairRelationship::LessEqual => "Greater-than".into(),
+            CellPairRelationship::Difference(d) => {
+                if *d == 1 {
+                    "Non-consecutive".into()
+                } else {
+                    format!("Anti-difference of {d}")
+                }
+            }
+            CellPairRelationship::Sum(n) => match *n {
+                5 => "Anti-V".into(),
+                10 => "Anti-X".into(),
+                _ => format!("Anti-sum of {n}"),
+            },
+            CellPairRelationship::Ratio(r) => match *r {
+                2 => "Anti-Black-Dot".into(),
+                _ => format!("Anti-ratio of {r}"),
+            },
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct CellPairsRule {
     cells: Vec<CellIndex>,
-    rels: HashSet<(CellIndex, CellIndex, CellPairRelationship)>,
+    rels: HashSet<(String, CellIndex, CellIndex, CellPairRelationship)>,
     negs: Vec<CellPairRelationship>,
 }
 
 impl CellPairsRule {
     pub fn new(
         cells: impl IntoIterator<Item = CellIndex>,
-        rels: impl IntoIterator<Item = (CellIndex, CellIndex, CellPairRelationship)>,
+        rels: impl IntoIterator<Item = (String, CellIndex, CellIndex, CellPairRelationship)>,
         negs: impl IntoIterator<Item = CellPairRelationship>,
     ) -> Self {
         Self {
@@ -55,31 +80,32 @@ impl Rule for CellPairsRule {
     fn apply(&self, builder: &mut PuzzleBuilder) {
         // Step one, create constraints for all the rels
         let mut used_pairs = HashSet::new();
-        for &(cell_a, cell_b, rel) in &self.rels {
+        for (name, cell_a, cell_b, rel) in &self.rels {
+            let (cell_a, cell_b, rel) = (*cell_a, *cell_b, *rel);
             used_pairs.insert((cell_a, cell_b));
             used_pairs.insert((cell_b, cell_a));
-            builder.add_constraint(CellPairConstraint::new(cell_a, cell_b, rel, false));
+            builder.add_constraint(CellPairConstraint::new(name, cell_a, cell_b, rel, false));
         }
         let regions = builder.regions().collect_vec();
         for (first, second) in self.rels.iter().tuple_combinations() {
-            if !(first.0 == second.0
-                || first.0 == second.1
-                || first.1 == second.0
-                || first.1 == second.1)
+            if !(first.1 == second.1
+                || first.1 == second.2
+                || first.2 == second.1
+                || first.2 == second.2)
             {
                 // no overlap
                 continue;
             }
-            let overlap = if first.0 == second.0 || first.0 == second.1 {
-                first.0
-            } else {
+            let overlap = if first.1 == second.1 || first.1 == second.2 {
                 first.1
-            };
-            let other_a = if first.0 == overlap { first.1 } else { first.0 };
-            let other_b = if second.0 == overlap {
-                second.1
             } else {
-                second.0
+                first.2
+            };
+            let other_a = if first.1 == overlap { first.2 } else { first.1 };
+            let other_b = if second.1 == overlap {
+                second.2
+            } else {
+                second.1
             };
 
             if !regions.iter().copied().any(|r| {
@@ -90,8 +116,15 @@ impl Rule for CellPairsRule {
                 continue;
             }
 
+            let name = if first.0 == second.0 {
+                first.0.clone()
+            } else {
+                format!("{n0} and {n1}", n0 = first.0, n1 = second.0)
+            };
+
             builder.add_constraint(DoubleCellPairConstraint::new(
-                first.0, first.1, first.2, false, second.0, second.1, second.2, false, overlap,
+                name, first.1, first.2, first.3, false, second.1, second.2, second.3, false,
+                overlap,
             ));
         }
         if self.negs.is_empty() {
@@ -101,7 +134,13 @@ impl Rule for CellPairsRule {
         for (cell_a, cell_b) in builder.all_orthogonal_pairs(&self.cells) {
             if !used_pairs.contains(&(cell_a, cell_b)) {
                 for neg in &self.negs {
-                    builder.add_constraint(CellPairConstraint::new(cell_a, cell_b, *neg, true));
+                    builder.add_constraint(CellPairConstraint::new(
+                        neg.neg_name(),
+                        cell_a,
+                        cell_b,
+                        *neg,
+                        true,
+                    ));
                 }
             }
         }
