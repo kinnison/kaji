@@ -191,6 +191,15 @@ impl From<FpuzzlesData> for PuzzleData {
             }
         }
 
+        for whisper in val.whispers {
+            let diff: i32 = whisper.value.unwrap().parse().unwrap();
+            for line in whisper.lines {
+                grid.rules_mut()
+                    .whispers
+                    .push((diff, line.into_iter().map(|c| (c.row, c.col)).collect()));
+            }
+        }
+
         let grid = GridData::new(0, 0, GridDataKind::Sudoku(grid));
 
         puzzle.push_grid(grid);

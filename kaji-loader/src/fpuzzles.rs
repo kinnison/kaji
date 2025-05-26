@@ -21,6 +21,10 @@ pub struct FpuzzlesData {
     pub solution: Option<Vec<NonZeroUsize>>,
     pub grid: Vec<Vec<FpuzzlesCellData>>,
 
+    // Cosmetic content which we can ignore
+    #[serde(default)]
+    pub line: Vec<serde_json::Value>,
+
     // Rules
     #[serde(default)]
     pub antiking: bool,
@@ -56,6 +60,8 @@ pub struct FpuzzlesData {
     pub minimum: Vec<FpuzzlesSingleCell>,
     #[serde(default)]
     pub thermometer: Vec<FpuzzlesLines>,
+    #[serde(default)]
+    pub whispers: Vec<FpuzzlesLines>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -84,8 +90,10 @@ pub struct FpuzzlesClones {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FpuzzlesLines {
     pub lines: Vec<Vec<FpuzzlesCellRef>>,
+    pub value: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
