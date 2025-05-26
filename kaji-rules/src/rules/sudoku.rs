@@ -2,6 +2,7 @@
 
 use std::collections::HashSet;
 
+use itertools::Itertools;
 use kaji::{CellInfo, PuzzleBuilder, Region, Rule, SymbolSetId};
 
 use crate::{
@@ -210,7 +211,24 @@ impl Rule for SudokuGrid<'_> {
             }
         }
 
-        CellPairsRule::new(cells.iter().copied(), pos_rels.chain(minimax), neg_rels).apply(builder);
+        let mut thermo_pairs = vec![];
+
+        for thermo in raw.rules().thermometer.iter() {
+            for (a, b) in thermo.iter().copied().tuple_windows() {
+                thermo_pairs.push((
+                    rows[a.0 - 1][a.1 - 1],
+                    rows[b.0 - 1][b.1 - 1],
+                    CellPairRelationship::LessThan,
+                ));
+            }
+        }
+
+        CellPairsRule::new(
+            cells.iter().copied(),
+            pos_rels.chain(minimax).chain(thermo_pairs),
+            neg_rels,
+        )
+        .apply(builder);
 
         // Add Sudoku techniques
 
