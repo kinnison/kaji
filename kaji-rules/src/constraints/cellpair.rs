@@ -127,6 +127,7 @@ pub struct DoubleCellPairConstraint {
     rel_cd: CellPairRelationship,
     neg_cd: bool,
     overlap: CellIndex,
+    double_overlap: bool,
 }
 
 impl DoubleCellPairConstraint {
@@ -141,6 +142,7 @@ impl DoubleCellPairConstraint {
         rel_cd: CellPairRelationship,
         neg_cd: bool,
         overlap: CellIndex,
+        double_overlap: bool,
     ) -> Self {
         assert!(cell_a == overlap || cell_b == overlap);
         assert!(cell_c == overlap || cell_d == overlap);
@@ -155,6 +157,7 @@ impl DoubleCellPairConstraint {
             rel_cd,
             neg_cd,
             overlap,
+            double_overlap,
         }
     }
 }
@@ -208,12 +211,18 @@ impl Constraint for DoubleCellPairConstraint {
                     })
                     .collect_vec()
             };
-            // There must be at least one member of permitted_ab not in permitted_cd or vice-versa
-            if permitted_ab.iter().all(|abv| permitted_cd.contains(abv))
-                && permitted_cd.iter().all(|cdv| permitted_ab.contains(cdv))
-                && permitted_ab.len() < 2
+
+            // In the double_overlap case, we need at least one of permitted_ab to be in
+            // permitted_cd since that could be the other cell
+            // If not double_overlap, there must be at least one member of permitted_ab not in permitted_cd or vice-versa
+
+            if (self.double_overlap && !permitted_ab.iter().any(|abv| permitted_cd.contains(abv)))
+                || (!self.double_overlap
+                    && permitted_ab.iter().all(|abv| permitted_cd.contains(abv))
+                    && permitted_cd.iter().all(|cdv| permitted_ab.contains(cdv))
+                    && permitted_ab.len() < 2)
             {
-                // effectively the same sets, so eliminate overlap_value from the overlap cell
+                // So by whatever means, the overlap cell value cannot stand, eliminate it.
                 let mut action = LogicalStep::action(&self.name);
                 action.push_str(" eliminates ");
                 action.push_symbols(Some(state.symbol(overlap_value.symbols()[0])));

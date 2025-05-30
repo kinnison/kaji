@@ -126,8 +126,17 @@ impl Rule for CellPairsRule {
             };
 
             builder.add_constraint(DoubleCellPairConstraint::new(
-                name, first.1, first.2, first.3, false, second.1, second.2, second.3, false,
+                name,
+                first.1,
+                first.2,
+                first.3,
+                false,
+                second.1,
+                second.2,
+                second.3,
+                false,
                 overlap,
+                other_a == other_b,
             ));
         }
         if self.negs.is_empty() {
