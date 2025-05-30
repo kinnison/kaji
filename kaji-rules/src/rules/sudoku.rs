@@ -6,7 +6,7 @@ use itertools::Itertools;
 use kaji::{CellInfo, PuzzleBuilder, Region, Rule, SymbolSetId};
 
 use crate::{
-    constraints::{CloneCell, GivenDigits, OddEven, Quadruple},
+    constraints::{CloneCell, GivenDigits, Indexer, OddEven, Quadruple, SudokuIndexerKind},
     puzzledata::SudokuGridData,
     techniques::{Fish, HiddenSingle, HiddenTuple, NakedSingle, NakedTuple, PointingSymbol},
 };
@@ -65,7 +65,7 @@ impl Rule for SudokuGrid<'_> {
             })
             .collect::<Vec<_>>();
 
-        let cols = cols
+        let region_cols = cols
             .into_iter()
             .enumerate()
             .map(|(n, col)| builder.add_region(Region::new(format!("Column {}", n + 1), col)))
@@ -77,7 +77,7 @@ impl Rule for SudokuGrid<'_> {
             box_cells[rawregion - 1].push(cells[cellidx]);
         }
 
-        let boxes = box_cells
+        let region_boxes = box_cells
             .iter()
             .enumerate()
             .map(|(boxn, boxcells)| {
@@ -108,11 +108,11 @@ impl Rule for SudokuGrid<'_> {
             }
         }
 
-        for region in region_rows
-            .into_iter()
-            .chain(cols.into_iter())
-            .chain(boxes.into_iter())
-            .chain(extra_regions.into_iter())
+        for &region in region_rows
+            .iter()
+            .chain(region_cols.iter())
+            .chain(region_boxes.iter())
+            .chain(extra_regions.iter())
         {
             NonRepeatRegion::new(region, self.digits).apply(builder);
         }
@@ -268,6 +268,19 @@ impl Rule for SudokuGrid<'_> {
             neg_rels,
         )
         .apply(builder);
+
+        // Now add all the indexers
+        for &(r, c, kind) in raw.rules().indexers.iter() {
+            let cell = rows[r - 1][c - 1];
+            let region = match kind {
+                SudokuIndexerKind::Row => region_cols[c - 1],
+                SudokuIndexerKind::Column => region_rows[r - 1],
+                SudokuIndexerKind::Box => {
+                    todo!("Work out the way to find a box")
+                }
+            };
+            builder.add_constraint(Indexer::new(cell, region));
+        }
 
         // Add Sudoku techniques
 

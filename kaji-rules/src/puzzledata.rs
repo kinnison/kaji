@@ -5,7 +5,10 @@ use std::num::NonZeroUsize;
 
 use kaji::{PuzzleBuilder, Rule, Symbol, SymbolValue};
 
-use crate::rules::{cellpairs::CellPairRelationship, sudoku::SudokuGrid};
+use crate::{
+    constraints::SudokuIndexerKind,
+    rules::{cellpairs::CellPairRelationship, sudoku::SudokuGrid},
+};
 
 #[derive(Debug, Default)]
 pub struct PuzzleData {
@@ -69,6 +72,8 @@ pub struct SudokuGridRulesData {
     pub thermometer: Vec<Vec<(usize, usize)>>,
     /// [diff,[(row,col)]]
     pub whispers: Vec<(i32, Vec<(usize, usize)>)>,
+    /// Indexers
+    pub indexers: Vec<(usize, usize, SudokuIndexerKind)>,
 }
 
 #[derive(Debug)]
