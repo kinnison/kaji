@@ -3,7 +3,7 @@ use kaji_rules::puzzledata::GridDataKind;
 use kaji_bin::load_fpuzzles_puzzle;
 
 fn main() {
-    let (puzzledata, puzzle) = load_fpuzzles_puzzle("german-whisper-test-1");
+    let (puzzledata, puzzle) = load_fpuzzles_puzzle("one-to-six");
 
     let board = puzzle.solve();
     puzzle.print_board(&board);

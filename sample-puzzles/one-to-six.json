@@ -1,0 +1,440 @@
+{
+  "size": 6,
+  "title": "One to Six, Inclusive",
+  "author": "Kinnison",
+  "grid": [
+    [
+      {
+        "candidates": [
+          4,
+          5,
+          6
+        ],
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          2
+        ],
+        "value": 2,
+        "given": true,
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          3
+        ],
+        "value": 3,
+        "given": true,
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          4,
+          6
+        ],
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          1
+        ],
+        "value": 1,
+        "given": true,
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          4,
+          6
+        ],
+        "c": "#8080F0"
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          4,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "candidates": [
+          2
+        ],
+        "value": 2,
+        "given": true
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ]
+      }
+    ],
+    [
+      {
+        "candidates": [
+          2,
+          4,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          2,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          4,
+          5,
+          6
+        ],
+        "c": "#FFD0D0"
+      },
+      {
+        "candidates": [
+          1
+        ],
+        "value": 1,
+        "given": true,
+        "c": "#FFD0D0"
+      }
+    ],
+    [
+      {
+        "candidates": [
+          3
+        ],
+        "value": 3,
+        "given": true,
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          4,
+          5,
+          6
+        ],
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          1,
+          5,
+          6
+        ],
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          2
+        ],
+        "value": 2,
+        "given": true,
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          5,
+          6
+        ],
+        "c": "#8080F0"
+      },
+      {
+        "candidates": [
+          5,
+          6
+        ],
+        "c": "#8080F0"
+      }
+    ],
+    [
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFA0A0"
+      },
+      {
+        "candidates": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "c": "#FFE060"
+      },
+      {
+        "candidates": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "c": "#B0FFB0"
+      },
+      {
+        "candidates": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "c": "#60D060"
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "c": "#D0D0FF"
+      },
+      {
+        "candidates": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "c": "#8080F0"
+      }
+    ]
+  ],
+  "rowindexer": [
+    {
+      "cells": [
+        "R2C1",
+        "R2C2",
+        "R2C3",
+        "R2C4",
+        "R2C5",
+        "R2C6"
+      ]
+    },
+    {
+      "cells": [
+        "R4C1",
+        "R4C2",
+        "R4C3",
+        "R4C4",
+        "R4C5",
+        "R4C6"
+      ]
+    }
+  ],
+  "columnindexer": [
+    {
+      "cells": [
+        "R5C1",
+        "R5C2",
+        "R5C3",
+        "R5C4",
+        "R5C5",
+        "R5C6"
+      ]
+    },
+    {
+      "cells": [
+        "R1C1",
+        "R1C2",
+        "R1C3",
+        "R1C4",
+        "R1C5",
+        "R1C6"
+      ]
+    }
+  ],
+  "solution": [
+    5,
+    2,
+    3,
+    6,
+    1,
+    4,
+    6,
+    1,
+    4,
+    5,
+    3,
+    2,
+    1,
+    3,
+    6,
+    4,
+    2,
+    5,
+    4,
+    5,
+    2,
+    3,
+    6,
+    1,
+    3,
+    4,
+    1,
+    2,
+    5,
+    6,
+    2,
+    6,
+    5,
+    1,
+    4,
+    3
+  ],
+  "cage": [
+    {
+      "cells": [
+        "R2C1",
+        "R2C2",
+        "R2C3",
+        "R2C4",
+        "R2C5",
+        "R2C6",
+        "R4C1",
+        "R4C2",
+        "R4C3",
+        "R4C4",
+        "R4C5",
+        "R4C6"
+      ],
+      "outlineC": "#7CC77C",
+      "fontC": "#000000",
+      "fromConstraint": "Row Indexer"
+    },
+    {
+      "cells": [
+        "R5C1",
+        "R5C2",
+        "R5C3",
+        "R5C4",
+        "R5C5",
+        "R5C6",
+        "R1C1",
+        "R1C2",
+        "R1C3",
+        "R1C4",
+        "R1C5",
+        "R1C6"
+      ],
+      "outlineC": "#C77C7C",
+      "fontC": "#000000",
+      "fromConstraint": "Column Indexer"
+    }
+  ]
+}

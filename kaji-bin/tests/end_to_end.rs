@@ -18,6 +18,7 @@ use rstest::rstest;
 #[case::thermo("galactic-map")]
 #[case::thermo("swirl-of-steam")]
 #[case::whisper("german-whisper-test-1")]
+#[case::indexer("one-to-six")]
 fn fpuzzle_works(#[case] puzzle: &str) {
     let (puzzledata, puzzle) = load_fpuzzles_puzzle(puzzle);
 
