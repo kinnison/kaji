@@ -2,6 +2,7 @@ use std::num::NonZeroUsize;
 
 use kaji::SymbolValue;
 use kaji_rules::{
+    constraints::SudokuIndexerKind,
     puzzledata::{
         GridData, GridDataKind, PuzzleData, RawSudokuPairRelationship, SudokuGridData,
         SudokuGridRuleCloneData, SudokuGridRuleQuadrupleData, SymbolData, SymbolSetData,
@@ -197,6 +198,22 @@ impl From<FpuzzlesData> for PuzzleData {
                 grid.rules_mut()
                     .whispers
                     .push((diff, line.into_iter().map(|c| (c.row, c.col)).collect()));
+            }
+        }
+
+        for rowindexer in val.rowindexer {
+            for cell in rowindexer.cells {
+                grid.rules_mut()
+                    .indexers
+                    .push((cell.row, cell.col, SudokuIndexerKind::Row));
+            }
+        }
+
+        for colindexer in val.columnindexer {
+            for cell in colindexer.cells {
+                grid.rules_mut()
+                    .indexers
+                    .push((cell.row, cell.col, SudokuIndexerKind::Column));
             }
         }
 

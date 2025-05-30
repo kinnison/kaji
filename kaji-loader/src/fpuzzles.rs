@@ -24,6 +24,8 @@ pub struct FpuzzlesData {
     // Cosmetic content which we can ignore
     #[serde(default)]
     pub line: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub cage: Vec<serde_json::Value>,
 
     // Rules
     #[serde(default)]
@@ -62,6 +64,15 @@ pub struct FpuzzlesData {
     pub thermometer: Vec<FpuzzlesLines>,
     #[serde(default)]
     pub whispers: Vec<FpuzzlesLines>,
+    #[serde(default)]
+    pub rowindexer: Vec<FpuzzlesCells>,
+    #[serde(default)]
+    pub columnindexer: Vec<FpuzzlesCells>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FpuzzlesCells {
+    pub cells: Vec<FpuzzlesCellRef>,
 }
 
 #[derive(Debug, Deserialize)]
