@@ -287,7 +287,7 @@ impl PuzzleBuilder {
     }
 
     pub fn regions(&self) -> impl Iterator<Item = RegionId> {
-        (0..self.regions.len()).map(|n| RegionId(n))
+        (0..self.regions.len()).map(RegionId)
     }
 
     pub fn region(&self, region: RegionId) -> &Region {

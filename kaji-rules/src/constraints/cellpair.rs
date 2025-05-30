@@ -133,6 +133,7 @@ pub struct DoubleCellPairConstraint {
 }
 
 impl DoubleCellPairConstraint {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: impl Into<String>,
         cell_a: CellIndex,
