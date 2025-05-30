@@ -125,8 +125,75 @@ pub enum Effect {
 
 #[derive(Debug, PartialEq)]
 pub struct CellValue {
-    symbols: Vec<SymbolId>,
+    symbols: SymbolCollection,
     value: i32,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+#[repr(transparent)]
+pub struct SymbolCollection(u64);
+
+impl SymbolCollection {
+    const LENGTH_MASK: u64 = 0xf000_0000_0000_0000;
+    const VALUE_MASK: u64 = 0x0fff_ffff_ffff_ffff;
+    const LENGTH_SHIFT: u64 = 60;
+    fn new() -> Self {
+        Self(0)
+    }
+
+    pub fn len(&self) -> usize {
+        ((self.0 & Self::LENGTH_MASK) >> Self::LENGTH_SHIFT) as usize
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    fn push(&mut self, symbol: SymbolId) {
+        let (setnr, symnr) = symbol.into_parts();
+        assert_eq!(setnr, self.len());
+        self.0 = (self.0 & Self::VALUE_MASK)
+            | ((symnr as u64) << (5 * setnr))
+            | ((self.len() + 1) << Self::LENGTH_SHIFT) as u64;
+    }
+
+    pub fn get(&self, idx: usize) -> SymbolId {
+        assert!(idx < self.len());
+        let symnr = ((self.0 & Self::VALUE_MASK) >> (5 * idx)) & 0x1f;
+        SymbolId::new(idx, symnr as usize)
+    }
+
+    pub fn pop(&mut self) -> Option<SymbolId> {
+        if self.is_empty() {
+            None
+        } else {
+            let ret = Some(self.get(self.len() - 1));
+            self.0 =
+                (self.0 & Self::VALUE_MASK) | (((self.len() - 1) as u64) << Self::LENGTH_SHIFT);
+            ret
+        }
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = SymbolId> {
+        *self
+    }
+
+    fn from_slice(value: &[SymbolId]) -> Self {
+        // Assuming symbols are sorted early set first
+        let mut ret = Self::new();
+        for sym in value {
+            ret.push(*sym);
+        }
+        ret
+    }
+}
+
+impl Iterator for SymbolCollection {
+    type Item = SymbolId;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.pop()
+    }
 }
 
 impl Effect {
@@ -136,15 +203,12 @@ impl Effect {
 }
 
 impl CellValue {
-    fn new(symbols: &[SymbolId], value: i32) -> Self {
-        Self {
-            symbols: symbols.to_vec(),
-            value,
-        }
+    fn new(symbols: SymbolCollection, value: i32) -> Self {
+        Self { symbols, value }
     }
 
-    pub fn symbols(&self) -> &[SymbolId] {
-        &self.symbols
+    pub fn symbols(&self) -> SymbolCollection {
+        self.symbols
     }
 
     pub fn value(&self) -> i32 {
@@ -171,6 +235,7 @@ impl PuzzleBuilder {
     }
 
     pub(crate) fn push_symbol_set(&mut self, set: RawSymbolSet) -> SymbolSetId {
+        assert!(self.symbols.len() < 12);
         self.symbols.push(set);
         SymbolSetId(self.symbols.len() - 1)
     }
@@ -794,7 +859,10 @@ impl<'p> SolveState<'p> {
     ) {
         if choice_n == choices.len() {
             // We've completed a set of choices, return this value
-            ret.push(CellValue::new(symbols, curval));
+            ret.push(CellValue::new(
+                SymbolCollection::from_slice(symbols),
+                curval,
+            ));
             return;
         }
         for opt in choices[choice_n].options() {

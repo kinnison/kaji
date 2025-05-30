@@ -62,12 +62,13 @@ impl Constraint for CellPairConstraint {
             {
                 // Nothing in values_b satisfies value_a
                 assert_eq!(value_a.symbols().len(), 1);
-                if state.eliminate(self.cell_a, value_a.symbols()[0]).changed() {
+                let sym_a = value_a.symbols().pop().unwrap();
+                if state.eliminate(self.cell_a, sym_a).changed() {
                     if changed {
                         action.push_str(", ");
                     }
                     changed = true;
-                    action.push_symbols(Some(state.symbol(value_a.symbols()[0])));
+                    action.push_symbols(Some(state.symbol(sym_a)));
                     action.push_str(" from ");
                     action.push_cells(Some(state.cell_info(self.cell_a)));
                 }
@@ -81,12 +82,13 @@ impl Constraint for CellPairConstraint {
             {
                 // Nothing in values_b satisfies value_a
                 assert_eq!(value_b.symbols().len(), 1);
-                if state.eliminate(self.cell_b, value_b.symbols()[0]).changed() {
+                let sym_b = value_b.symbols().pop().unwrap();
+                if state.eliminate(self.cell_b, sym_b).changed() {
                     if changed {
                         action.push_str(", ");
                     }
                     changed = true;
-                    action.push_symbols(Some(state.symbol(value_b.symbols()[0])));
+                    action.push_symbols(Some(state.symbol(sym_b)));
                     action.push_str(" from ");
                     action.push_cells(Some(state.cell_info(self.cell_b)));
                 }
@@ -181,6 +183,8 @@ impl Constraint for DoubleCellPairConstraint {
         let values_d = state.cell_values(self.cell_d).collect_vec();
 
         for overlap_value in state.cell_values(self.overlap) {
+            assert!(overlap_value.symbols().len() == 1);
+            let sym_o = overlap_value.symbols().pop().unwrap();
             let permitted_ab = if self.overlap == self.cell_a {
                 values_b
                     .iter()
@@ -225,13 +229,10 @@ impl Constraint for DoubleCellPairConstraint {
                 // So by whatever means, the overlap cell value cannot stand, eliminate it.
                 let mut action = LogicalStep::action(&self.name);
                 action.push_str(" eliminates ");
-                action.push_symbols(Some(state.symbol(overlap_value.symbols()[0])));
+                action.push_symbols(Some(state.symbol(sym_o)));
                 action.push_str(" from ");
                 action.push_cells(Some(state.cell_info(self.overlap)));
-                if state
-                    .eliminate(self.overlap, overlap_value.symbols()[0])
-                    .changed()
-                {
+                if state.eliminate(self.overlap, sym_o).changed() {
                     return action;
                 }
             }

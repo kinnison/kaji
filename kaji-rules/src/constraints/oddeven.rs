@@ -45,9 +45,10 @@ impl Constraint for OddEven {
         let mut elims = vec![];
         for value in values {
             let is_odd = (value.value() & 1) == 1;
+            let sym0 = value.symbols().pop().unwrap();
             if is_odd != self.is_odd {
-                elims.push(value.symbols()[0]);
-                state.eliminate(self.cell, value.symbols()[0]);
+                elims.push(sym0);
+                state.eliminate(self.cell, sym0);
             }
         }
         if !elims.is_empty() {
